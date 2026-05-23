@@ -38,6 +38,14 @@ namespace haru {
         }
         delete frame_target;
     }
+    void blur_frame(cv::VideoWriter &output,cv::Mat &frame,int repeat) {
+        cv::Mat mat;
+        int initial_value = 5;
+        for (int i = repeat; i > 0; i--) {
+            cv::blur(frame, mat, cv::Size(i+5, i+5));
+            output << mat;
+        }
+    }
     void repeat_frame(cv::VideoWriter &output,cv::Mat &frame,int repeat) {
         for (int i = 0; i < repeat; i++) {
             output << frame;
@@ -120,6 +128,10 @@ namespace haru {
                     for (int i = -90; i < 0; i=i+10) {
                         rotate_frame(output,resized_img,i,1);
                     }
+                    repeat_frame(output,resized_img,20);
+                    break;
+                case 8:
+                    blur_frame(output,resized_img,10);
                     repeat_frame(output,resized_img,20);
                     break;
             }

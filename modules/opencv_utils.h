@@ -41,5 +41,6 @@ namespace haru {
     cv::Mat *shift_frame_horizentally(cv::Mat &frame,double shift);
     cv::Mat *contrast(cv::Mat &frame, double alpha, int beta);
     void skin_smooth(cv::Mat &src,cv::Mat &smoothedImage);
+    void load_image();
 }
 #endif //HARU_OPENCV_WEB_OPENCV_UTILS_H

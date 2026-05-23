@@ -1,5 +1,7 @@
 #include "include/httplib.hpp"
 #include <string>
+
+#include "modules/opencv_utils.h"
 #include "modules/photo_handler.h"
 
 using namespace haru;

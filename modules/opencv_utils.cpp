@@ -467,6 +467,76 @@ namespace haru {
         double sigmaSpace = 75;
         cv::bilateralFilter(src, smoothedImage, d, sigmaColor, sigmaSpace);
     }
+    void load_image() {
+        std::cout << "OpenCV version: " << CV_VERSION << std::endl;
+        // Load the image
+        cv::Mat src = cv::imread("IMG_2333.jpeg");
+        if (src.empty()) {
+            std::cout << "Could not open or find the image" << std::endl;
+            return;
+        }
+
+        // Load pre-trained Haar Cascade for Face Detection
+        cv::CascadeClassifier face_cascade;
+        std::cout << "Loading face cascade..." << std::endl;
+        if (!face_cascade.load("haarcascade_frontalface_alt.xml")) {
+            std::cout << "--(!)Error loading face cascade" << std::endl;
+            return;
+        }
+
+        std::cout << "Detect faces..." << std::endl;
+        // Detect faces
+        std::vector<cv::Rect> faces;
+        cv::Mat gray;
+        cvtColor(src, gray, cv::COLOR_BGR2GRAY);
+        equalizeHist(gray, gray);
+        face_cascade.detectMultiScale(gray, faces, 1.1, 4, 0 | cv::CASCADE_SCALE_IMAGE, cv::Size(30, 30));
+
+        // Create a copy to hold our beautified result
+        cv::Mat result = src.clone();
+
+        // Process each detected face
+        std::cout << "Beautifying faces...faces.size()=" << faces.size() << std::endl;
+        for (size_t i = 0; i < faces.size(); i++) {
+            cv::Rect face_rect = faces[i];
+            cv::Mat faceROI = result(face_rect);
+
+            // Apply Bilateral Filter for skin smoothing
+            // Parameters: input, output, diameter of pixel neighborhood, sigmaColor, sigmaSpace
+            cv::Mat smoothed_face;
+            bilateralFilter(faceROI, smoothed_face, 9, 85, 85);
+
+            // Place the smoothed face back into the image
+            smoothed_face.copyTo(result(face_rect));
+        }
+        // Save and display the result
+        cv::Mat blur_image;
+        // cv::blur(result, blur_image, cv::Size(50, 50));
+        // cv::blur(blur_image, result, cv::Size(2, 2));
+        for (int i=1; i<51; i=i+2)
+        {
+            // smooth the image in the "src" and save it to "dst"
+            // blur(src, dst, Size(i,i));
+
+            // Gaussian smoothing
+            GaussianBlur( src, blur_image, cv::Size( i, i ), 0, 0 );
+
+            // Median smoothing
+            // medianBlur( result, blur_image, i );
+
+            // show the blurred image with the text
+            cv::imshow( "Median filter", blur_image );
+
+            // wait for 5 seconds
+            cv::waitKey(5000);
+        }
+        // cv::GaussianBlur(result, blur_image, cv::Size(5, 5), 0, 0);
+        // cv::addWeighted(blur_image, 2.0, result, -1.0, 0);
+        // cv::addWeighted(blur_image, 2.0, result, -0.5, 0, result);
+        // imwrite("beautified_face.jpg", result);
+        // imshow("Beautified Face", result);
+        // cv::waitKey(0);
+    }
 }
 //
 // Created by developer on 2026-05-19.

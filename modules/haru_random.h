@@ -8,7 +8,7 @@
 using namespace std;
 namespace haru {
     int min = 1;
-    int max = 7;
+    int max = 8;
 
     // Initialize a random number generator
     random_device rd;
