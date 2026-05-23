@@ -25,6 +25,11 @@ namespace haru {
     void create_folder(std::string parent,std::string name){
         create_folder(parent + "/" + name);
     }
+    std::string create_folder_under(std::string pathname,std::string name){
+        fs::path filePath(pathname);
+        create_folder(filePath.parent_path().string(),name);
+        return filePath.parent_path().string() + "/" + name;
+    }
     int process_filesystem_file(std::string path,std::string destination){
         // std::cout << "process_filesystem_file::" << path << std::endl;
         fs::path filePath(path);
@@ -91,5 +96,14 @@ namespace haru {
             }
         }
         return files;
+    }
+    void find_image_directory(std::string path,std::vector<std::string> &files) {
+        for (const auto & entry : std::filesystem::directory_iterator(path)) {
+            if (entry.is_directory() && entry.path().filename() == "jpeg") {
+                files.push_back(entry.path().string());
+            } else if (entry.is_directory()){
+                find_image_directory(entry.path().string(),files);
+            }
+        }
     }
 }

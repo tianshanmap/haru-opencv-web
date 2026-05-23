@@ -71,7 +71,7 @@ namespace haru {
     }
     void process_photoes(std::string path,std::string videoFile){
         std::vector<std::string> files = getFiles(path,".jpeg");
-        std::cout << "files.size() => " << files.size() << std::endl;
+        std::cout << "Total jpeg files to be handled => " << files.size() << std::endl;
         cv::VideoWriter output(videoFile, CV_FOURCC('H', '2', '6', '4'), 5, S);
         for (std::string file : files) {
             cv::Mat frame = cv::imread(file);
