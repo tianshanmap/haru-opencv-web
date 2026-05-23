@@ -10,7 +10,12 @@ namespace haru {
         std::cout << "move_file::" << source << " to " << destination << std::endl;
         fs::rename(source, destination);
     }
-
+    void clear_folder(std::string path) {
+        fs::path folderPath(path);
+        for (const auto& entry : fs::directory_iterator(folderPath)) {
+            fs::remove(entry.path());
+        }  
+    }
     void create_folder(std::string name){
         try {
             if (fs::create_directories(name)) {
@@ -27,8 +32,10 @@ namespace haru {
     }
     std::string create_folder_under(std::string pathname,std::string name){
         fs::path filePath(pathname);
-        create_folder(filePath.parent_path().string(),name);
-        return filePath.parent_path().string() + "/" + name;
+        std::string target = filePath.parent_path().string() + "/" + name;
+        clear_folder(target);
+        create_folder(target);
+        return target;
     }
     int process_filesystem_file(std::string path,std::string destination){
         // std::cout << "process_filesystem_file::" << path << std::endl;

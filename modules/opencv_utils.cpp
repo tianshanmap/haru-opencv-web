@@ -4,6 +4,7 @@
 #include "opencv_utils.h"
 
 namespace haru {
+    const cv::Scalar BACKGROUND_COLOR = cv::Scalar(235, 245, 244);
     std::string getVideo()
     {
         // return "/Users/developer/T9/document/seijin/Big-Boobs-Japanese-Mature.mp4";
@@ -536,6 +537,82 @@ namespace haru {
         // imwrite("beautified_face.jpg", result);
         // imshow("Beautified Face", result);
         // cv::waitKey(0);
+    }
+    cv::Mat *resize_image(cv::Mat src,double scale,int bgWidth,int bgHeight) {
+        // 1. Define the size of the background image and create it (e.g., black background)
+        // cv::Mat background = cv::Mat::zeros(bgHeight, bgWidth, CV_8UC3);
+        cv::Mat *background = new cv::Mat(cv::Mat(bgHeight, bgWidth, CV_8UC3, BACKGROUND_COLOR));
+        // 2. Load the image you want to place
+        cv::Mat overlayImage;
+        cv::resize(src, overlayImage, cv::Size(), scale, scale, cv::INTER_LINEAR);
+        // 3. Define where you want to place the image (top-left coordinates)
+
+        int overlayImage_width = overlayImage.cols;
+        int x_offset = bgWidth/2 - overlayImage_width/2;
+        if (x_offset < 0) {
+            x_offset = 0;
+        }
+        int y_offset = bgHeight/2 - overlayImage.rows/2;
+        if (y_offset < 0) {
+            y_offset = 0;
+        }
+        // std::cout << "x_offset=" << x_offset << ",y_offset=" << y_offset << std::endl;
+        // 4. Create a rectangle for the ROI ensuring it does not exceed background boundaries
+        int width = std::min(overlayImage.cols, (*background).cols - x_offset);
+        int height = std::min(overlayImage.rows, (*background).rows - y_offset);
+
+        if (width > 0 && height > 0) {
+            // 5. Define the ROI on the background and copy the overlay image into it
+            cv::Mat roi = (*background)(cv::Rect(x_offset, y_offset, width, height));
+            overlayImage(cv::Rect(0, 0, width, height)).copyTo(roi);
+        }
+        return background;
+    }
+    cv::Mat *place_image_with_background(cv::Mat src,double scale,int bgWidth,int bgHeight) {
+        // 1. Define the size of the background image and create it (e.g., black background)
+        // cv::Mat background = cv::Mat::zeros(bgHeight, bgWidth, CV_8UC3);
+        cv::Mat *background = new cv::Mat(cv::Mat(bgHeight, bgWidth, CV_8UC3, BACKGROUND_COLOR));
+        // 2. Load the image you want to place
+        cv::Mat overlayImage;
+        cv::resize(src, overlayImage, cv::Size(), scale, scale, cv::INTER_LINEAR);
+        // 3. Define where you want to place the image (top-left coordinates)
+
+        int overlayImage_width = overlayImage.cols;
+        int x_offset = bgWidth/2 - overlayImage_width/2;
+        if (x_offset < 0) {
+            x_offset = 0;
+        }
+        int y_offset = bgHeight/2 - overlayImage.rows/2;
+        if (y_offset < 0) {
+            y_offset = 0;
+        }
+        std::cout << "x_offset=" << x_offset << ",y_offset=" << y_offset << std::endl;
+        // 4. Create a rectangle for the ROI ensuring it does not exceed background boundaries
+        int width = std::min(overlayImage.cols, (*background).cols - x_offset);
+        int height = std::min(overlayImage.rows, (*background).rows - y_offset);
+
+        if (width > 0 && height > 0) {
+            // 5. Define the ROI on the background and copy the overlay image into it
+            cv::Mat roi = (*background)(cv::Rect(x_offset, y_offset, width, height));
+            overlayImage(cv::Rect(0, 0, width, height)).copyTo(roi);
+        }
+        return background;
+    }
+    int play_image_with_background(std::string &input_image_path,int bgWidth,int bgHeight) {
+        // 2. Load the image you want to place
+        cv::Mat src = cv::imread(input_image_path);
+        if (src.empty()) {
+            std::cout << "Could not open or find the image!" << std::endl;
+            return -1;
+        }
+        std::cout << "Image loaded successfully!" << std::endl;
+        std::cout << "Image loaded size=(w,h)=(" << src.cols << "," << src.rows << ")" << std::endl;
+        cv::Mat *frame = place_image_with_background(src,0.5,bgWidth,bgHeight);
+        // 6. Display the result
+        cv::imshow("Result", *frame);
+        cv::waitKey(0);
+        delete frame;
+        return 0;
     }
 }
 //

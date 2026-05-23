@@ -7,7 +7,12 @@
 #include "haru_random.h"
 
 namespace haru {
-    cv::Size S = cv::Size(800,600);
+    const int HARU_FRAME_WIDTH = 1240;
+    const int HARU_FRAME_HEIGHT = 1024;
+    const cv::Size HARU_IMAGE_SIZE = cv::Size(HARU_FRAME_WIDTH,HARU_FRAME_HEIGHT);
+    const int HARU_CODEC = CV_FOURCC('a', 'v', 'c', '1');
+    const int HARU_FPS = 5;
+
     void flip_frame_horizentally(cv::VideoWriter &output,cv::Mat &frame,int repeat) {
         cv::Mat flippedFrame;
         // ... assume frame is populated ...
@@ -72,13 +77,14 @@ namespace haru {
     void process_photoes(std::string path,std::string videoFile){
         std::vector<std::string> files = getFiles(path,".jpeg");
         std::cout << "Total jpeg files to be handled => " << files.size() << std::endl;
-        cv::VideoWriter output(videoFile, CV_FOURCC('H', '2', '6', '4'), 5, S);
+        cv::VideoWriter output(videoFile, HARU_CODEC, HARU_FPS, HARU_IMAGE_SIZE);
         for (std::string file : files) {
             cv::Mat frame = cv::imread(file);
             // std::cout << "Handle file=> " << file << ",size=" << frame.size << std::endl;
-            cv::Mat resized_img;
+            // cv::Mat resized_img;
             // Resize to 300x200 (Width x Height)
-            cv::resize(frame, resized_img, S);
+            // cv::resize(frame, resized_img, HARU_IMAGE_SIZE);
+            cv::Mat *resized_img = resize_image(frame,0.3,HARU_FRAME_WIDTH,HARU_FRAME_HEIGHT);
             // for (int i = 20; i >= 0; i=i-10) {
             //     rotate_frame(output,resized_img,i,1);
             // }
@@ -90,51 +96,52 @@ namespace haru {
             // std::cout << "Random Number => " << my_rd << std::endl;
             switch (my_rd) {
                 case 1:
-                    repeat_frame(output,resized_img,1);
+                    repeat_frame(output,*resized_img,1);
                     for (double i = 0; i <= 400.0; i=i+20.0) {
-                        output_shift_frame_horizentally(output,resized_img,i);
+                        output_shift_frame_horizentally(output,*resized_img,i);
                     }
                     break;
                 case 2:
-                    repeat_frame(output,resized_img,1);
+                    repeat_frame(output,*resized_img,1);
                     for (double i = 400; i > 0; i=i-20.0) {
-                        output_shift_frame_horizentally(output,resized_img,i);
+                        output_shift_frame_horizentally(output,*resized_img,i);
                     }
                     break;
                 case 3:
-                    repeat_frame(output,resized_img,1);
+                    repeat_frame(output,*resized_img,1);
                     for (double i = 0; i <= 190.0; i=i+10.0) {
-                        output_shift_frame_vertically(output,resized_img,i);
+                        output_shift_frame_vertically(output,*resized_img,i);
                         // skin_smooth(frame,resized_img);
                         // output << resized_img;
                     }
                     break;
                 case 4:
-                    repeat_frame(output,resized_img,1);
+                    repeat_frame(output,*resized_img,1);
                     for (double i = 190; i > 0; i=i-10.0) {
-                        output_shift_frame_vertically(output,resized_img,i);
+                        output_shift_frame_vertically(output,*resized_img,i);
                     }
                     break;
                 case 5:
-                    repeat_frame(output,resized_img,20);
+                    repeat_frame(output,*resized_img,20);
                     break;
                 case 6:
                     for (int i = 90; i >= 0; i=i-10) {
-                        rotate_frame(output,resized_img,i,1);
+                        rotate_frame(output,*resized_img,i,1);
                     }
-                    repeat_frame(output,resized_img,20);
+                    repeat_frame(output,*resized_img,20);
                     break;
                 case 7:
                     for (int i = -90; i < 0; i=i+10) {
-                        rotate_frame(output,resized_img,i,1);
+                        rotate_frame(output,*resized_img,i,1);
                     }
-                    repeat_frame(output,resized_img,20);
+                    repeat_frame(output,*resized_img,20);
                     break;
                 case 8:
-                    blur_frame(output,resized_img,10);
-                    repeat_frame(output,resized_img,20);
+                    blur_frame(output,*resized_img,10);
+                    repeat_frame(output,*resized_img,20);
                     break;
             }
+            delete resized_img;
         }
         output.release();
         cv::destroyAllWindows();

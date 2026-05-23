@@ -1,5 +1,6 @@
 #include "include/httplib.hpp"
 #include <string>
+#include <filesystem>
 
 #include "modules/opencv_utils.h"
 #include "modules/file_utils.h"
@@ -20,10 +21,13 @@ int main()
         std::cout << "Process directory => " << file << std::endl;
         std::string export_path = create_folder_under(file,"export");
         std::cout << "Process export directory => " << export_path << std::endl;
-        process_photoes(file,export_path + "/export-photoes.mp4");
+        std::filesystem::path filepath(export_path);
+        process_photoes(file,export_path + "/" + filepath.parent_path().filename().string() + ".mp4");
     }
     // std::string output = "/Users/developer/T9/travels/processed/2026-01-16-2026-01-23-singapore-maleka/export/malaka.mp4";
     // process_photoes(destination,output);
+    // std::string path = "/Users/developer/T9/travels/processed/2026-01-16-2026-01-23-singapore-maleka/jpeg/IMG_2257.jpeg";
+    // play_image_with_background(path,2048,2048);
 }//
 // Created by developer on 2026-05-19.
 //
