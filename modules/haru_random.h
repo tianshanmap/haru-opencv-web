@@ -7,18 +7,23 @@
 #include <random>
 using namespace std;
 namespace haru {
-    int min = 1;
-    int max = 8;
-
-    // Initialize a random number generator
-    random_device rd;
-    mt19937 gen(rd());
-    uniform_int_distribution<> distrib(min, max);
-
-    // Generate random number in the range [min, max]
-    // int randomValue = distrib(gen);
-    int getRandom() {
-        return distrib(gen);
-    }
+    class HaruRandom {
+    private:
+        int min;
+        int max;
+        mt19937 gen;
+        random_device rd;
+        uniform_int_distribution<> distrib;
+    public:
+        HaruRandom(int min,int max) {
+            this->min = min;
+            this->max = max;
+            gen = mt19937(rd());
+            distrib = uniform_int_distribution<>(min,max);
+        }
+        int getRandom() {
+            return distrib(gen);
+        }
+    };
 }
 #endif //HARU_OPENCV_WEB_HARU_RANDOM_H

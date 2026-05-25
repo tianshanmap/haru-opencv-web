@@ -2,9 +2,11 @@
 #include <opencv2/imgproc/types_c.h>
 #include "file_utils.h"
 #include "opencv_utils.h"
+#include "haru_random.h"
 
 namespace haru {
-    const cv::Scalar BACKGROUND_COLOR = cv::Scalar(235, 245, 244);
+    const cv::Scalar BACKGROUND_COLOR = cv::Scalar(135, 206, 235);
+    HaruRandom haru_random(1,5);
     std::string getVideo()
     {
         // return "/Users/developer/T9/document/seijin/Big-Boobs-Japanese-Mature.mp4";
@@ -538,10 +540,20 @@ namespace haru {
         // imshow("Beautified Face", result);
         // cv::waitKey(0);
     }
+
+    cv::Scalar getMatColor(cv::Mat &src) {
+        int my_rd = haru_random.getRandom();
+        cv::Vec3b intensity = src.at<cv::Vec3b>(10*my_rd, 10*my_rd);
+        uchar blue = intensity.val[0];
+        uchar green = intensity.val[1];
+        uchar red = intensity.val[2];
+        return cv::Scalar(blue, green, red);
+    }
     cv::Mat *resize_image(cv::Mat src,double scale,int bgWidth,int bgHeight) {
         // 1. Define the size of the background image and create it (e.g., black background)
         // cv::Mat background = cv::Mat::zeros(bgHeight, bgWidth, CV_8UC3);
-        cv::Mat *background = new cv::Mat(cv::Mat(bgHeight, bgWidth, CV_8UC3, BACKGROUND_COLOR));
+        // cv::Mat *background = new cv::Mat(cv::Mat(bgHeight, bgWidth, CV_8UC3, BACKGROUND_COLOR));
+        cv::Mat *background = new cv::Mat(cv::Mat(bgHeight, bgWidth, CV_8UC3, getMatColor(src)));
         // 2. Load the image you want to place
         cv::Mat overlayImage;
         cv::resize(src, overlayImage, cv::Size(), scale, scale, cv::INTER_LINEAR);
@@ -563,8 +575,10 @@ namespace haru {
 
         if (width > 0 && height > 0) {
             // 5. Define the ROI on the background and copy the overlay image into it
-            cv::Mat roi = (*background)(cv::Rect(x_offset, y_offset, width, height));
-            overlayImage(cv::Rect(0, 0, width, height)).copyTo(roi);
+            // cv::Mat roi = (*background)(cv::Rect(0, 0, width, height));
+            // overlayImage(cv::Rect(0, 0, width, height)).copyTo(roi);
+            cv::Mat roi1 = (*background)(cv::Rect(x_offset, y_offset, width, height));
+            overlayImage(cv::Rect(0, 0, width, height)).copyTo(roi1);
         }
         return background;
     }

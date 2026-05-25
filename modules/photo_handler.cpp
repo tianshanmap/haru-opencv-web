@@ -7,6 +7,7 @@
 #include "haru_random.h"
 
 namespace haru {
+    const double HARU_SCALE = 0.3;
     const int HARU_FRAME_WIDTH = 1240;
     const int HARU_FRAME_HEIGHT = 1024;
     const cv::Size HARU_IMAGE_SIZE = cv::Size(HARU_FRAME_WIDTH,HARU_FRAME_HEIGHT);
@@ -67,14 +68,19 @@ namespace haru {
         delete shiftedImage;
     }
     void rotate_frame(cv::VideoWriter &output,cv::Mat &frame,double angle,int repeat) {
+        // cv::Mat dst;
+        // cv::bitwise_not(frame, dst);
+        // cv::Mat *frame1 = styleImage(frame);
         cv::Mat *frame_target = rotation(frame,angle);
         // cv::Mat *frame_target1 = contrast(*frame_target,2,1.0);
         for (int i = 0; i < repeat; i++) {
             output << *frame_target;
         }
+        // delete frame1;
         delete frame_target;
     }
     void process_photoes(std::string path,std::string videoFile){
+        HaruRandom haru_random(1,9);
         std::vector<std::string> files = getFiles(path,".jpeg");
         std::cout << "Total jpeg files to be handled => " << files.size() << std::endl;
         cv::VideoWriter output(videoFile, HARU_CODEC, HARU_FPS, HARU_IMAGE_SIZE);
@@ -84,7 +90,7 @@ namespace haru {
             // cv::Mat resized_img;
             // Resize to 300x200 (Width x Height)
             // cv::resize(frame, resized_img, HARU_IMAGE_SIZE);
-            cv::Mat *resized_img = resize_image(frame,0.3,HARU_FRAME_WIDTH,HARU_FRAME_HEIGHT);
+            cv::Mat *resized_img = resize_image(frame,HARU_SCALE,HARU_FRAME_WIDTH,HARU_FRAME_HEIGHT);
             // for (int i = 20; i >= 0; i=i-10) {
             //     rotate_frame(output,resized_img,i,1);
             // }
@@ -92,7 +98,7 @@ namespace haru {
             // for (int i = -20; i < 0; i=i+10) {
             //     rotate_frame(output,resized_img,i,1);
             // }
-            int my_rd = getRandom();
+            int my_rd = haru_random.getRandom();
             // std::cout << "Random Number => " << my_rd << std::endl;
             switch (my_rd) {
                 case 1:
@@ -100,12 +106,14 @@ namespace haru {
                     for (double i = 0; i <= 400.0; i=i+20.0) {
                         output_shift_frame_horizentally(output,*resized_img,i);
                     }
+                    repeat_frame(output,*resized_img,5);
                     break;
                 case 2:
                     repeat_frame(output,*resized_img,1);
                     for (double i = 400; i > 0; i=i-20.0) {
                         output_shift_frame_horizentally(output,*resized_img,i);
                     }
+                    repeat_frame(output,*resized_img,5);
                     break;
                 case 3:
                     repeat_frame(output,*resized_img,1);
@@ -114,12 +122,14 @@ namespace haru {
                         // skin_smooth(frame,resized_img);
                         // output << resized_img;
                     }
+                    repeat_frame(output,*resized_img,5);
                     break;
                 case 4:
                     repeat_frame(output,*resized_img,1);
                     for (double i = 190; i > 0; i=i-10.0) {
                         output_shift_frame_vertically(output,*resized_img,i);
                     }
+                    repeat_frame(output,*resized_img,5);
                     break;
                 case 5:
                     repeat_frame(output,*resized_img,20);
@@ -137,6 +147,10 @@ namespace haru {
                     repeat_frame(output,*resized_img,20);
                     break;
                 case 8:
+                    blur_frame(output,*resized_img,10);
+                    repeat_frame(output,*resized_img,20);
+                    break;
+                case 9:
                     blur_frame(output,*resized_img,10);
                     repeat_frame(output,*resized_img,20);
                     break;
