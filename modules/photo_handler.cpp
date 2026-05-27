@@ -8,6 +8,7 @@
 #include "opencv_utils.h"
 #include "haru_random.h"
 #include "haru_ffmpeg.h"
+#include "haru_yaml.h"
 
 namespace haru {
     const double HARU_SCALE = 0.4;
@@ -211,12 +212,12 @@ namespace haru {
         }
         return export_mp4_files;
     }
-    void create_video() {
-        std::string source = "/Users/developer/T9/travels/processed";
-        std::string export_path = "/Users/developer/T9/workshop/export-photoes-mp4";
-        std::string export_path_mp3_mp4 = "/Users/developer/T9/workshop/final-photoes-mp4";
-        std::string media_mp3_path = "/Users/developer/T9/workshop/media-mp3";
-        std::string media_mp3_processed_path = "/Users/developer/T9/workshop/media-mp3-export";
+    void create_video(YamlConfig &config) {
+        std::string source = config.source;
+        std::string export_path = config.export_path;
+        std::string export_path_mp3_mp4 = config.final_photoes_export;
+        std::string media_mp3_path = config.media_mp3_path;
+        std::string media_mp3_processed_path = config.media_mp3_path_export;
         std::cout << "create_video::" << source << " to " << export_path << std::endl;
         std::vector<std::string> export_mp4_files = make_video_from_photoes(source,export_path);
         std::vector<std::string> mp3_files = getFiles(media_mp3_path,".mp3");

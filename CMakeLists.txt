@@ -23,6 +23,16 @@ pkg_check_modules(FFMPEG REQUIRED IMPORTED_TARGET
 )
 message(STATUS "OpenCV_INCLUDE_DIRS=${OpenCV_INCLUDE_DIRS}")
 message(STATUS "CMAKE_OSX_DEPLOYMENT_TARGET=${CMAKE_OSX_DEPLOYMENT_TARGET}")
+
+include(FetchContent)
+
+FetchContent_Declare(
+        yaml-cpp
+        GIT_REPOSITORY https://github.com/jbeder/yaml-cpp.git
+        GIT_TAG master # Can be a tag (yaml-cpp-x.x.x), a commit hash, or a branch name (master)
+)
+FetchContent_MakeAvailable(yaml-cpp)
+
 # main code
 add_executable(opencv-web
         main.cpp
@@ -35,9 +45,11 @@ add_executable(opencv-web
         modules/photo_handler.h
         modules/haru_httpserver.cpp
         modules/haru_ffmpeg.cpp
-        modules/haru_ffmpeg.h)
+        modules/haru_ffmpeg.h
+        modules/haru_yaml.h
+)
 
 # 3. Link OpenCV libraries to your executable
-target_link_libraries(opencv-web ${OpenCV_LIBS} PkgConfig::FFMPEG)
+target_link_libraries(opencv-web ${OpenCV_LIBS} PkgConfig::FFMPEG yaml-cpp::yaml-cpp)
 target_include_directories(opencv-web PRIVATE ${OpenCV_INCLUDE_DIRS})
 target_include_directories(opencv-web PRIVATE PkgConfig::FFMPEG)
