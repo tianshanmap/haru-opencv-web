@@ -3,6 +3,7 @@
 #include "file_utils.h"
 #include "opencv_utils.h"
 #include "haru_random.h"
+#include <cmath>
 
 namespace haru {
     const cv::Scalar BACKGROUND_COLOR = cv::Scalar(135, 206, 235);
@@ -278,6 +279,16 @@ namespace haru {
         convertImage(image, buffer);
     }
 
+    /*
+     * alpha : contrast
+     * beta : brightness, bigger
+     * g(x) = alpha * f(x) + beta
+     * Beta - Lightness/Brightness: Controls the overall additive brightness (lightness) of the image.
+     *      A positive value makes the image lighter, while a negative value makes it darker.
+     * Alpha - Contrast: Controls the contrast. Values (1.0) keep the image as-is,
+     *      values (>1.0) increase contrast (making bright pixels brighter and dark pixels darker),
+     *      and values (<1.0) reduce contrast (making the image look flatter).
+     */
     cv::Mat *contrast(cv::Mat &frame, double alpha, int beta)
     {
 
@@ -555,30 +566,35 @@ namespace haru {
         // cv::Mat *background = new cv::Mat(cv::Mat(bgHeight, bgWidth, CV_8UC3, BACKGROUND_COLOR));
         cv::Mat *background = new cv::Mat(cv::Mat(bgHeight, bgWidth, CV_8UC3, getMatColor(src)));
         // 2. Load the image you want to place
-        cv::Mat overlayImage;
-        cv::resize(src, overlayImage, cv::Size(), scale, scale, cv::INTER_LINEAR);
+        cv::Mat scaledImage;
+        cv::resize(src, scaledImage, cv::Size(), scale, scale, cv::INTER_LINEAR);
         // 3. Define where you want to place the image (top-left coordinates)
 
-        int overlayImage_width = overlayImage.cols;
-        int x_offset = bgWidth/2 - overlayImage_width/2;
+        int scaledImage_width = scaledImage.cols;
+        int x_offset = bgWidth/2 - scaledImage_width/2;
         if (x_offset < 0) {
             x_offset = 0;
         }
-        int y_offset = bgHeight/2 - overlayImage.rows/2;
+        int y_offset = bgHeight/2 - scaledImage.rows/2;
+        int y_offset_origin = y_offset;
         if (y_offset < 0) {
             y_offset = 0;
         }
         // std::cout << "x_offset=" << x_offset << ",y_offset=" << y_offset << std::endl;
         // 4. Create a rectangle for the ROI ensuring it does not exceed background boundaries
-        int width = std::min(overlayImage.cols, (*background).cols - x_offset);
-        int height = std::min(overlayImage.rows, (*background).rows - y_offset);
+        int width = std::min(scaledImage.cols, (*background).cols - x_offset);
+        int height = std::min(scaledImage.rows, (*background).rows - y_offset);
 
         if (width > 0 && height > 0) {
             // 5. Define the ROI on the background and copy the overlay image into it
             // cv::Mat roi = (*background)(cv::Rect(0, 0, width, height));
             // overlayImage(cv::Rect(0, 0, width, height)).copyTo(roi);
             cv::Mat roi1 = (*background)(cv::Rect(x_offset, y_offset, width, height));
-            overlayImage(cv::Rect(0, 0, width, height)).copyTo(roi1);
+            if (y_offset_origin < 0) {
+                scaledImage(cv::Rect(0, std::abs(y_offset_origin), width, height)).copyTo(roi1);
+            } else {
+                scaledImage(cv::Rect(0, 0, width, height)).copyTo(roi1);
+            }
         }
         return background;
     }

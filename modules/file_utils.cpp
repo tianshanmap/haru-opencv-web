@@ -6,7 +6,12 @@ namespace fs = std::filesystem;
 namespace haru {
     void move_file(std::string source,std::string parent){
         fs::path filePath = source;
-        fs::path destination(parent + "/" + filePath.filename().string());
+        fs::path destination;
+        if (filePath.extension() == ".jpg") {
+            destination = parent + "/" + filePath.stem().string() + ".jpeg";
+        } else {
+            destination = parent + "/" + filePath.filename().string();
+        }
         std::cout << "move_file::" << source << " to " << destination << std::endl;
         fs::rename(source, destination);
     }
@@ -43,12 +48,12 @@ namespace haru {
         // Get the parent path
         fs::path parent = filePath.parent_path().filename();
         std::string target = destination + "/" + parent.string() + "/jpeg";
-        if (path.ends_with(".jpeg")){
+        if (path.ends_with(".jpeg") || path.ends_with(".jpg")){
             // std::cout << "process_filesystem_file::jpeg" << path << std::endl;
             std::string target = destination + "/" + parent.string() + "/jpeg";
             create_folder(target);
             move_file(filePath.string(),target);
-        } else if (path.ends_with(".mov")){
+        } else if (path.ends_with(".mov") || path.ends_with(".mp4")){
             std::cout << "process_filesystem_file::mov=>" << path << std::endl;
             std::string target = destination + "/" + parent.string() + "/mov";
             create_folder(target);

@@ -5,41 +5,64 @@
 #include "modules/opencv_utils.h"
 #include "modules/file_utils.h"
 #include "modules/photo_handler.h"
+#include "modules/haru_ffmpeg.h"
+#include "modules/file_utils.h"
 
 using namespace haru;
-void worker() {
-    std::cout << "Thread is working...\n";
-}
-int main()
-{
-    std::thread t(worker);
-     // webMain();
-    // std::string source = "/Users/developer/T9/travels/2026-01-14_2026-03-25";
-    // std::string destination = "/Users/developer/T9/travels/processed";
-    // process_filesystem(source, destination);
-    // std::string destination = "/Users/developer/T9/travels/processed/2026-01-16-2026-01-23-singapore-maleka/jpeg";
+void create_video() {
     std::string source = "/Users/developer/T9/travels/processed";
     std::string export_path = "/Users/developer/T9/travels/export";
-    std::vector<std::string> files;
-    find_image_directory(source,files);
-    std::vector<std::thread> thread_pool;
-    for (auto file : files) {
-        std::cout << "Process directory => " << file << std::endl;
-        // std::string export_path = create_folder_under(file,"export");
-        // std::cout << "Process export directory => " << export_path << std::endl;
-        std::filesystem::path filepath(file);
-        std::cout << "Process filepath => " << filepath.filename() << std::endl;
-        // process_photoes(file,export_path + "/" + filepath.parent_path().filename().string() + ".mp4");
-        std::thread th(process_photoes,file,export_path + "/" + filepath.parent_path().filename().string() + ".mp4");
-        thread_pool.push_back(std::move(th));
+    std::string export_path_mp3_mp4 = "/Users/developer/T9/travels/export-mp3-mp4";
+    std::cout << "create_video::" << source << " to " << export_path << std::endl;
+    std::vector<std::string> export_mp4_files = make_video_from_photoes(source,export_path);
+    std::vector<std::string> mp3_files = getFiles("/Users/developer/T9/travels/play-music",".mp3");
+    std::string merged_mp3_output = "/Users/developer/T9/travels/play-music-export";
+    HaruMp3Files mp3_files_obj{.mp3_path = merged_mp3_output,.files = mp3_files};
+    for (std::string video_file : export_mp4_files) {
+        std::cout << "video => " << video_file << std::endl;
+        std::filesystem::path filePath(video_file);
+        std::string filename = export_path_mp3_mp4 + "/" + filePath.filename().string();
+        std::cout << "video with mp3 => " << filename << std::endl;
+        std::string mp3_filename = mp3_files_obj.merge_mp3();
+        std::cout << "merged mp3 => " << mp3_filename << std::endl;
+        add_mp3_to_mp4(mp3_filename,video_file,filename);
     }
-    for (auto &th : thread_pool) {
-        th.join();
+}
+void merge_mp3() {
+    std::vector<std::string> export_mp4_files = {"one","two","three","four","five","six","seven","eight"};
+    std::string merged_mp3_output = "/Users/developer/T9/travels/play-music-export";
+    std::vector<std::string> mp3_files = getFiles("/Users/developer/T9/travels/play-music",".mp3");
+    HaruMp3Files mp3_files_obj{.mp3_path = merged_mp3_output,.files = mp3_files};
+    for (std::string video_file : export_mp4_files) {
+        std::cout << "video => " << video_file << std::endl;
+        std::string mp3_filename = mp3_files_obj.merge_mp3();
     }
-    // std::string output = "/Users/developer/T9/travels/processed/2026-01-16-2026-01-23-singapore-maleka/export/malaka.mp4";
-    // process_photoes(destination,output);
-    // std::string path = "/Users/developer/T9/travels/processed/2026-01-16-2026-01-23-singapore-maleka/jpeg/IMG_2257.jpeg";
-    // play_image_with_background(path,2048,2048);
-}//
-// Created by developer on 2026-05-19.
-//
+}
+void handle_photoes() {
+    std::string source = "/Users/developer/T9/travels/sumsong";
+    std::string destination = "/Users/developer/T9/travels/processed";
+    process_filesystem(source, destination);
+}
+void test() {
+    std::filesystem::path filePath("/Users/developer/T9/travels/export-workspace/20251202_080503.jpg");
+    std::cout << filePath.extension() << std::endl;
+    std::cout << filePath.stem() << std::endl;
+
+}
+
+int main() {
+    // webMain();
+    //create_video();
+    // std::string mp1 = "/Users/developer/T9/travels/export-workspace/audio1.mp3";
+    // std::string mp2 = "/Users/developer/T9/travels/export-workspace/audio2.mp3";
+    // std::string output = "/Users/developer/T9/travels/export-workspace/audio-export.mp3";
+    // concatenateMP3(mp1,mp2,output);
+    // std::string mp3 = "/Users/developer/T9/travels/export-workspace/audio-export.mp3";
+    // std::string mp4 = "/Users/developer/T9/travels/export-workspace/video.mp4";
+    // std::string output = "/Users/developer/T9/travels/export-workspace/video-export.mp4";
+    // merge_mp4_and_mp3(mp3,mp4,output);
+    create_video();
+    // merge_mp3();
+    // handle_photoes();
+    // test();
+}
