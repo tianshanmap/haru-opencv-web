@@ -1,13 +1,14 @@
 #include <iostream>
+
+#include "haru_yaml.h"
 #include "../include/httplib.hpp"
 #include "opencv_utils.h"
 namespace haru {
-    int webMain()
+    int webMain(YamlConfig &config)
     {
         // std::cout is used to print text to the console
-        std::cout << "Hello, World!" << std::endl;
+        std::cout << "Web application is listening at " << config.host << ":" << config.port << "..." << std::endl;
         httplib::Server svr;
-
         // http GET
         svr.Get("/hi", [](const httplib::Request &req, httplib::Response &res)
                 {
@@ -480,9 +481,8 @@ namespace haru {
         });
 
         // Set static files
-        svr.set_mount_point("/static", "/Users/developer/Downloads");
-
-        svr.listen("0.0.0.0", 8080);
+        svr.set_mount_point("/static", config.static_path);
+        svr.listen(config.host, config.port);
         return 0; // Returning 0 indicates the program finished successfully
     }
 

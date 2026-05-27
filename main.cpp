@@ -6,6 +6,7 @@
 #include "modules/file_utils.h"
 #include "modules/photo_handler.h"
 #include "modules/haru_ffmpeg.h"
+#include "modules/haru_httpserver.h"
 
 using namespace haru;
 void merge_mp3() {
@@ -31,7 +32,9 @@ void test() {
 }
 
 int main() {
-    // webMain();
+    YamlConfig config{.yaml_path="../config/application.yaml"};
+    config.load_yaml();
+    webMain(config);
     //create_video();
     // std::string mp1 = "/Users/developer/T9/travels/export-workspace/audio1.mp3";
     // std::string mp2 = "/Users/developer/T9/travels/export-workspace/audio2.mp3";
@@ -41,11 +44,11 @@ int main() {
     // std::string mp4 = "/Users/developer/T9/travels/export-workspace/video.mp4";
     // std::string output = "/Users/developer/T9/travels/export-workspace/video-export.mp4";
     // merge_mp4_and_mp3(mp3,mp4,output);
-    YamlConfig config{.yaml_path="../config/application.yaml"};
-    config.load_yaml();
-    std::cout << config.source << std::endl;
-    std::cout << config.export_path << std::endl;
-    create_video(config);
+    // YamlConfig config{.yaml_path="../config/application.yaml"};
+    // config.load_yaml();
+    // std::cout << config.source << std::endl;
+    // std::cout << config.export_path << std::endl;
+    // create_video(config);
     // merge_mp3();
     // handle_photoes();
     // test();
