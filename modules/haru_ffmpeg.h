@@ -2,6 +2,7 @@
 // Created by developer on 2026-05-25.
 //
 #include <iostream>
+#include <fstream>
 #ifndef HARU_OPENCV_WEB_HARU_FFMPEG_H
 #define HARU_OPENCV_WEB_HARU_FFMPEG_H
 namespace haru {
