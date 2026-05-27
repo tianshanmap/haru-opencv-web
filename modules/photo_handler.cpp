@@ -91,6 +91,16 @@ namespace haru {
         // delete frame1;
         delete frame_target;
     }
+    void putText(cv::Mat frame,std::string text) {
+        cv::Point org(50, 250);             // Bottom-left corner of the text string
+        int fontFace = cv::FONT_HERSHEY_SIMPLEX;
+        double fontScale = 1.0;
+        cv::Scalar color(0, 255, 0);        // Green color in BGR format
+        int thickness = 2;
+        int lineType = cv::LINE_AA;         // Anti-aliased line for smoother rendering
+        // 3. Apply the text to the Mat
+        cv::putText(frame, text, org, fontFace, fontScale, color, thickness, lineType);
+    }
     void process_photoes(std::string path,std::string videoFile){
         HaruRandom haru_random(1,9);
         std::vector<std::string> files = getFiles(path,".jpeg");
@@ -98,6 +108,7 @@ namespace haru {
         cv::VideoWriter output(videoFile, HARU_CODEC, HARU_FPS, HARU_IMAGE_SIZE);
         for (std::string file : files) {
             cv::Mat frame = cv::imread(file);
+            putText(frame,path);
             // std::cout << "Handle file=> " << file << ",size=" << frame.size << std::endl;
             // cv::Mat resized_img;
             // Resize to 300x200 (Width x Height)

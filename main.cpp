@@ -11,13 +11,15 @@
 using namespace haru;
 void create_video() {
     std::string source = "/Users/developer/T9/travels/processed";
-    std::string export_path = "/Users/developer/T9/travels/export";
-    std::string export_path_mp3_mp4 = "/Users/developer/T9/travels/export-mp3-mp4";
+    std::string export_path = "/Users/developer/T9/workshop/export-photoes-mp4";
+    std::string export_path_mp3_mp4 = "/Users/developer/T9/workshop/final-photoes-mp4";
+    std::string media_mp3_path = "/Users/developer/T9/workshop/media-mp3";
+    std::string media_mp3_processed_path = "/Users/developer/T9/workshop/media-mp3-export";
     std::cout << "create_video::" << source << " to " << export_path << std::endl;
     std::vector<std::string> export_mp4_files = make_video_from_photoes(source,export_path);
-    std::vector<std::string> mp3_files = getFiles("/Users/developer/T9/travels/play-music",".mp3");
-    std::string merged_mp3_output = "/Users/developer/T9/travels/play-music-export";
-    HaruMp3Files mp3_files_obj{.mp3_path = merged_mp3_output,.files = mp3_files};
+    std::vector<std::string> mp3_files = getFiles(media_mp3_path,".mp3");
+    // std::string merged_mp3_output = "/Users/developer/T9/travels/play-music-export";
+    HaruMp3Files mp3_files_obj{.mp3_path = media_mp3_processed_path,.files = mp3_files};
     for (std::string video_file : export_mp4_files) {
         std::cout << "video => " << video_file << std::endl;
         std::filesystem::path filePath(video_file);
