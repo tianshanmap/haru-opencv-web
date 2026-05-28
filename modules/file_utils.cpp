@@ -1,6 +1,8 @@
 #include <filesystem>
 #include <iostream>
 #include <random>
+#include <sstream>
+#include <fstream>
 
 namespace fs = std::filesystem;
 namespace haru {
@@ -117,5 +119,60 @@ namespace haru {
                 find_image_directory(entry.path().string(),files);
             }
         }
+    }
+    int scan_directory(const std::string path,std::vector<std::string> &files,const std::string extension) {
+        // std::string path = "/Users/developer/T9/travels/2026-01-14_2026-03-25/2026-01-16-2026-01-23-singapore-maleka";
+        std::cout << "scan_filesystem_directory::" << path << std::endl;
+        // Validate path
+
+        std::error_code ec; // To handle errors without exceptions
+        fs::path folderPath(path);
+        std::cout << "\nContents of folder:\n";
+        for (const auto& entry : fs::directory_iterator(folderPath, ec)) {
+            if (ec) {
+                std::cerr << "Error reading directory: " << ec.message() << "\n";
+                return 1;
+            }
+            if (fs::is_directory(entry.path())){
+                scan_directory(entry.path(),files,extension);
+            } else {
+                if (entry.path().extension() == extension) {
+                    files.push_back(entry.path().string());
+                }
+            }
+        }
+        return 0;
+    }
+    void write_to_file(std::string &path,std::ostringstream &buffer) {
+        std::ofstream myfile;
+        myfile.open (path + "/mov.txt");
+        myfile << buffer.str();
+        myfile.close();
+        buffer.str("");
+        buffer.clear();
+        std::cout << "write_to_file::" << path << std::endl;
+    }
+    std::vector<std::string> create_textfile_for_merge(std::vector<std::string> &files) {
+        std::vector<std::string> files_parent;
+        std::vector<std::string> files_with_same_parent;
+        std::filesystem::path currentFilePath(files[0]);
+        std::string current_parent = currentFilePath.parent_path().string();
+        std::ostringstream buffer;
+        for (int i = 0; i < files.size(); i++) {
+            std::filesystem::path filePath(files[i]);
+            std::string parent = filePath.parent_path().string();
+            if (parent != current_parent) {
+                files_parent.push_back(parent);
+                if (!buffer.str().empty()) {
+                    write_to_file(current_parent,buffer);
+                }
+                current_parent = parent;
+            }
+            buffer << "file " << "'" << files[i] << "'" << std::endl;
+        }
+        if (!buffer.str().empty()) {
+            write_to_file(current_parent,buffer);
+        }
+        return files_parent;
     }
 }

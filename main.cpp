@@ -8,6 +8,7 @@
 #include "modules/haru_ffmpeg.h"
 #include "modules/haru_httpserver.h"
 #include <simplelogger/simple_logger.hpp>
+
 using namespace haru;
 void merge_mp3() {
     std::vector<std::string> export_mp4_files = {"one","two","three","four","five","six","seven","eight"};
@@ -40,8 +41,18 @@ int main() {
     logger.info("info");
     logger.warning("warning");
     logger.error("error");
-    // webMain(config);
-    load_video("/Users/developer/T9/document/seijin/slave.mp4","/Users/developer/T9/document/seijin/image");
+    webMain(config);
+    // load_video("/Users/developer/T9/document/seijin/slave.mp4","/Users/developer/T9/document/seijin/image");
+    // std::vector<std::string> mov_files;
+    // scan_directory("/Users/developer/T9/travels/d.backup",mov_files,".mov");
+    // for (std::string file : mov_files) {
+    //     logger.info("mov file => " + file);
+    // }
+    // std::vector<std::string> files_parent = create_textfile_for_merge(mov_files);
+    // for (std::string file : files_parent) {
+    //     logger.info("Parent mov file => " + file);
+    // }
+    // combine_video(files_parent,"/Users/developer/T9/workshop/export-combined-mov",".mp4");
     // std::string filename1 = "/Users/developer/T9/document/seijin/image/frame_206.jpg";
     // std::string filename2 = "/Users/developer/T9/travels/processed/s25-malasia/jpeg/20260119_125700.jpeg";
     // combine_image(filename1,filename2);

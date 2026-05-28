@@ -7,6 +7,8 @@
 #ifndef HARU_OPENCV_WEB_FILE_UTILS_H
 #define HARU_OPENCV_WEB_FILE_UTILS_H
 namespace haru {
+    int scan_directory(const std::string path,std::vector<std::string> &files,const std::string extension);
+    std::vector<std::string> create_textfile_for_merge(std::vector<std::string> &files);
     int process_filesystem(std::string path,std::string destination);
     std::vector<std::string> getFiles(std::string path,std::string extension);
     void find_image_directory(std::string path,std::vector<std::string> &files);

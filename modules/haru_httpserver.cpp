@@ -16,11 +16,11 @@ namespace haru {
         HaruHttpServer svr(&http_server);
 
         // http GET
-        svr.Get("/hi", [](const httplib::Request &req, httplib::Response &res)
+        svr.Get("/static", [](const httplib::Request &req, httplib::Response &res)
                 {
             res.set_header("X-Custom-Header", "MyValue");
             res.set_header("Access-Control-Allow-Origin", "*");
-            res.set_content("Hello!", "text/plain"); });
+            res.set_content(cd .."Hello!", "text/html"); });
         // With Query Parameter
         svr.Get("/search", [](const auto &req, auto &res)
                 {
