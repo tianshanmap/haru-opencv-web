@@ -7,6 +7,7 @@
 #include "modules/photo_handler.h"
 #include "modules/haru_ffmpeg.h"
 #include "modules/haru_httpserver.h"
+#include "modules/simple_logger.h"
 
 using namespace haru;
 void merge_mp3() {
@@ -34,6 +35,12 @@ void test() {
 int main() {
     YamlConfig config{.yaml_path="../config/application.yaml"};
     config.load_yaml();
+    SimpleLogger &logger = SimpleLogger::getInstance();
+    logger.configure("../log/log.txt",LogLevel::INFO);
+    logger.debug("debug");
+    logger.info("info");
+    logger.warning("warning");
+    logger.error("error");
     webMain(config);
     //create_video();
     // std::string mp1 = "/Users/developer/T9/travels/export-workspace/audio1.mp3";

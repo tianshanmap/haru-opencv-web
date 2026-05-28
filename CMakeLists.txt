@@ -48,6 +48,8 @@ add_executable(opencv-web
         modules/haru_ffmpeg.h
         modules/haru_yaml.h
         modules/haru_httpserver.h
+        modules/simple_logger.cpp
+        modules/simple_logger.h
 )
 
 # 3. Link OpenCV libraries to your executable

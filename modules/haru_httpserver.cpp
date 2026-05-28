@@ -3,12 +3,18 @@
 #include "haru_yaml.h"
 #include "../include/httplib.hpp"
 #include "opencv_utils.h"
+#include "haru_httpserver.h"
+#include "simple_logger.h"
+
 namespace haru {
     int webMain(YamlConfig &config)
     {
         // std::cout is used to print text to the console
-        std::cout << "Web application is listening at " << config.host << ":" << config.port << "..." << std::endl;
-        httplib::Server svr;
+        SimpleLogger &logger = SimpleLogger::getInstance();
+        logger.info("Web application is listening at ",config.host,config.port,"...");
+        httplib::Server http_server;
+        HaruHttpServer svr(&http_server);
+
         // http GET
         svr.Get("/hi", [](const httplib::Request &req, httplib::Response &res)
                 {
@@ -482,7 +488,7 @@ namespace haru {
 
         // Set static files
         svr.set_mount_point("/static", config.static_path);
-        svr.listen(config.host, config.port);
+        svr.start(config.host, config.port);
         return 0; // Returning 0 indicates the program finished successfully
     }
 
