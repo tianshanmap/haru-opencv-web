@@ -2,7 +2,7 @@
 // Created by developer on 2026-05-27.
 //
 #include "../include/httplib.hpp"
-#include "simple_logger.h"
+#include <simplelogger/simple_logger.hpp>
 
 #ifndef HARU_OPENCV_WEB_HARU_HTTPSERVER_H
 #define HARU_OPENCV_WEB_HARU_HTTPSERVER_H

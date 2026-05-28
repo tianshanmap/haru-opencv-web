@@ -4,7 +4,7 @@
 #include "../include/httplib.hpp"
 #include "opencv_utils.h"
 #include "haru_httpserver.h"
-#include "simple_logger.h"
+#include "simplelogger/simple_logger.hpp"
 
 namespace haru {
     int webMain(YamlConfig &config)

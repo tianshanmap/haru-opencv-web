@@ -734,8 +734,8 @@ namespace haru {
         // Images must be identical size for blending
         cv::resize(img2, img2, img1.size());
 
-        double alpha = 0.7; // Weight of the first image (0.0 to 1.0)
-        double beta = 0.3;  // Weight of the second image (1.0 - alpha)
+        double alpha = 0.3; // Weight of the first image (0.0 to 1.0)
+        double beta = 0.7;  // Weight of the second image (1.0 - alpha)
         double gamma = 0.2; // Scalar added to each sum
         cv::Mat blended_image;
 
