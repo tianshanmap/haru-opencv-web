@@ -44,5 +44,8 @@ namespace haru {
     void load_image();
     int play_image_with_background(std::string &input_image_path,int bgWidth,int bgHeight);
     cv::Mat *resize_image(cv::Mat src,double scale,int bgWidth,int bgHeight);
+    void load_video(std::string filename,std::filesystem::path parent_path);
+    void combine_image(std::string &filename1,std::string &filename2);
+    void combine_overlay(std::string &filename1,std::string &filename2);
 }
 #endif //HARU_OPENCV_WEB_OPENCV_UTILS_H

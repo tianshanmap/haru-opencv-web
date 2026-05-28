@@ -41,7 +41,12 @@ int main() {
     logger.info("info");
     logger.warning("warning");
     logger.error("error");
-    webMain(config);
+    // webMain(config);
+    // load_video("/Users/developer/T9/document/seijin/Maki Kozue is a perfect sex slave in every way [kimvvpkb353].mp4","/Users/developer/T9/document/seijin/image");
+    std::string filename1 = "/Users/developer/T9/document/seijin/image/frame_206.jpg";
+    std::string filename2 = "/Users/developer/T9/travels/processed/s25-malasia/jpeg/20260119_125700.jpeg";
+    // combine_image(filename1,filename2);
+    combine_overlay(filename1,filename2);
     //create_video();
     // std::string mp1 = "/Users/developer/T9/travels/export-workspace/audio1.mp3";
     // std::string mp2 = "/Users/developer/T9/travels/export-workspace/audio2.mp3";

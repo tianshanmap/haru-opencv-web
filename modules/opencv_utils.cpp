@@ -1,10 +1,14 @@
 #include <iostream> // Header for input and output
+#include <filesystem>
 #include <opencv2/imgproc/types_c.h>
 #include "file_utils.h"
 #include "opencv_utils.h"
 #include "haru_random.h"
 #include <cmath>
 
+int g_slider_position = 0;
+int g_run = 1, g_dontset = 0; //start out in single step mode
+cv::VideoCapture g_cap;
 namespace haru {
     const cv::Scalar BACKGROUND_COLOR = cv::Scalar(135, 206, 235);
     HaruRandom haru_random(1,5);
@@ -643,6 +647,113 @@ namespace haru {
         cv::waitKey(0);
         delete frame;
         return 0;
+    }
+    void onTrackbarSlide( int pos, void *) {
+        g_cap.set( cv::CAP_PROP_POS_FRAMES, pos );
+        if( !g_dontset )
+            g_run = 1;
+        g_dontset = 0;
+    }
+    void save_image(cv::Mat& frame,std::string filename) {
+        cv::imwrite(filename, frame);
+    }
+    void load_video(std::string filename,std::filesystem::path parent_path) {
+        cv::namedWindow( "Example2_4", cv::WINDOW_AUTOSIZE );
+        cv::VideoCapture g_cap;
+        g_cap.open(filename);
+        int frames = (int) g_cap.get(cv::CAP_PROP_FRAME_COUNT);
+        int tmpw = (int) g_cap.get(cv::CAP_PROP_FRAME_WIDTH);
+        int tmph = (int) g_cap.get(cv::CAP_PROP_FRAME_HEIGHT);
+        std::cout << "Video has " << frames << " frames of dimensions("
+        << tmpw << ", " << tmph << ")." << std::endl;
+        cv::createTrackbar("Position", "Example2_4", &g_slider_position, frames,
+        onTrackbarSlide);
+        cv::Mat frame;
+        for(;;) {
+            if( g_run != 0 ) {
+                g_cap >> frame; if(frame.empty()) break;
+                int current_pos = (int)g_cap.get(cv::CAP_PROP_POS_FRAMES);
+                g_dontset = 1;
+                cv::setTrackbarPos("Position", "Example2_4", current_pos);
+                cv::imshow( "Example2_4", frame );
+                g_run-=1;
+            }
+            char c = (char) cv::waitKey(10);
+            //single mode
+            if( c == 's' ){
+                g_run = 1;
+                std::cout << "Single step, run = " << g_run << std::endl;
+            }
+            //run mode
+            if( c == 'r' ) {
+                g_run = -1;
+                std::cout << "Run mode, run = " << g_run << std::endl;
+            }
+            //save the image to the file system
+            if( c == 'w' ) {
+                std::string filename = parent_path.string() + "/frame_" + std::to_string(g_slider_position) + ".jpg";
+                save_image(frame,filename);
+                std::cout << "Save mode, run = " << g_run << std::endl;
+                cv::namedWindow( "Example2_5-in", cv::WINDOW_AUTOSIZE );
+                cv::namedWindow( "Example2_5-out", cv::WINDOW_AUTOSIZE );
+                cv::Mat out;
+                cv::GaussianBlur( frame, out, cv::Size(5,5), 3, 3);
+                cv::GaussianBlur( out, out, cv::Size(5,5), 3, 3);
+                cv::imshow( "Example2_5-in", frame );
+                cv::imshow( "Example2_5-out", out );
+            }
+            if( c == 27 )
+                break;
+        }
+    }
+    void combine_image(cv::Mat &img1,cv::Mat &img2) {
+        // Force matching heights for horizontal stacking if necessary
+        if (img1.rows != img2.rows) {
+            cv::resize(img2, img2, cv::Size(img2.cols * img1.rows / img2.rows, img1.rows));
+        }
+
+        // Combine horizontally
+        cv::Mat combined_horizontal;
+        cv::hconcat(img1, img2, combined_horizontal);
+
+        // Save and display
+        cv::imwrite("combined_side_by_side.jpg", combined_horizontal);
+        cv::imshow("Horizontal Merge", combined_horizontal);
+        cv::waitKey(0);
+    }
+    void combine_image(std::string &filename1,std::string &filename2) {
+        cv::Mat img1 = cv::imread(filename1);
+        cv::Mat img2 = cv::imread(filename2);
+        if (img1.empty() || img2.empty()) {
+            std::cout << "Could not open or find the images!" << std::endl;
+            return;
+        }
+        combine_image(img1,img2);
+    }
+    void combine_overlay(cv::Mat &img1,cv::Mat &img2) {
+        // Images must be identical size for blending
+        cv::resize(img2, img2, img1.size());
+
+        double alpha = 0.7; // Weight of the first image (0.0 to 1.0)
+        double beta = 0.3;  // Weight of the second image (1.0 - alpha)
+        double gamma = 0.2; // Scalar added to each sum
+        cv::Mat blended_image;
+
+        // Blend the images
+        cv::addWeighted(img1, alpha, img2, beta, gamma, blended_image);
+
+        cv::imwrite("blended_output.jpg", blended_image);
+        cv::imshow("Blended Merge", blended_image);
+        cv::waitKey(0);
+    }
+    void combine_overlay(std::string &filename1,std::string &filename2) {
+        cv::Mat img1 = cv::imread(filename1);
+        cv::Mat img2 = cv::imread(filename2);
+        if (img1.empty() || img2.empty()) {
+            std::cout << "Could not open or find the images!" << std::endl;
+            return;
+        }
+        combine_overlay(img1,img2);
     }
 }
 //
