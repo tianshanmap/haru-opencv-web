@@ -14,8 +14,8 @@ namespace haru {
     HaruRandom haru_random(1,5);
     std::string getVideo()
     {
-        // return "/Users/developer/T9/document/seijin/Big-Boobs-Japanese-Mature.mp4";
-        return "/Users/developer/T9/document/movie/猩疯血雨.mp4";
+        return "/Users/developer/T9/document/seijin/slave.mp4";
+        // return "/Users/developer/T9/document/movie/猩疯血雨.mp4";
     }
 
     std::vector<std::string> split(const std::string &s, char delim)

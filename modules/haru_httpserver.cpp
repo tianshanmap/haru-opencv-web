@@ -20,7 +20,7 @@ namespace haru {
                 {
             res.set_header("X-Custom-Header", "MyValue");
             res.set_header("Access-Control-Allow-Origin", "*");
-            res.set_content(cd .."Hello!", "text/html"); });
+            res.set_content("Hello!", "text/html"); });
         // With Query Parameter
         svr.Get("/search", [](const auto &req, auto &res)
                 {
