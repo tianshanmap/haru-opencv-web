@@ -14,7 +14,7 @@ namespace haru {
     HaruRandom haru_random(1,5);
     std::string getVideo()
     {
-        return "/Users/developer/T9/document/seijin/slave.mp4";
+        return "/Users/developer/T9/document/seijin/Unfaithful-things.mp4";
         // return "/Users/developer/T9/document/movie/猩疯血雨.mp4";
     }
 
@@ -315,14 +315,15 @@ namespace haru {
         sigma_s	Range between 0 to 200.
         sigma_r	Range between 0 to 1.
     */
-    cv::Mat *edgePreservingImage(cv::Mat &frame)
+    cv::Mat *edgePreservingImage(cv::Mat &frame,double sigma_s,double sigma_r)
     {
 
         // we will save the resulting image in rotated_image matrix
         cv::Mat image;
         cv::Mat *style_image = new cv::Mat();
         cv::Mat image1;
-        cv::edgePreservingFilter(frame, *style_image, 1, 100, 0.25);
+        // cv::edgePreservingFilter(frame, *style_image, 1, 100, 0.25);
+        cv::edgePreservingFilter(frame, *style_image, 1, sigma_s,sigma_r);
         return style_image;
     }
 

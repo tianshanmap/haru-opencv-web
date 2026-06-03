@@ -4,6 +4,8 @@
 #include "../include/httplib.hpp"
 #include "opencv_utils.h"
 #include "haru_httpserver.h"
+
+#include "file_utils.h"
 #include "simplelogger/simple_logger.hpp"
 
 namespace haru {
@@ -436,15 +438,17 @@ namespace haru {
             convertImage(*filtered_image,image_data);
             std::string s(image_data.begin(), image_data.end());
             res.set_content(s, "image/jpeg"); });
-        svr.Get("/image/edgePreserving/:id", [](const auto &req, auto &res)
+        svr.Get("/image/edgePreserving/:id/:sigma_s/:sigma_r", [](const auto &req, auto &res)
                 {
             auto id = req.path_params.at("id");
             auto frame_id = std::stoi(id);
+            auto sigma_s = std::stof(req.path_params.at("sigma_s"));
+            auto sigma_r = std::stof(req.path_params.at("sigma_r"));
             cv::Mat frame;
             std::vector<uchar> image_data;
             std::string filename = getVideo();
             read_frame(frame_id,filename,frame);
-            cv::Mat *filtered_image = edgePreservingImage(frame);
+            cv::Mat *filtered_image = edgePreservingImage(frame,sigma_s,sigma_r);
             convertImage(*filtered_image,image_data);
             std::string s(image_data.begin(), image_data.end());
             res.set_content(s, "image/jpeg"); });
@@ -485,6 +489,22 @@ namespace haru {
                 }
             );
         });
+        svr.Get("/filesystem/folder", [](const auto &req, auto &res)
+                {
+            auto name = req.get_param_value("name");
+            std::string s = get_folder_as_json(name);
+            // Allow requests from any frontend origin
+            res.set_header("Access-Control-Allow-Origin", "*");
+            res.set_content(s, "application/json"); });
+        svr.Get("/filesystem/view", [](const auto &req, auto &res)
+                {
+            auto name = req.get_param_value("name");
+            std::string content_type = get_content_type(name);
+            std::string buffer = read_binary_file(name);
+
+            // Allow requests from any frontend origin
+            res.set_header("Access-Control-Allow-Origin", "*");
+            res.set_content(buffer, content_type); });
 
         // Set static files
         svr.set_mount_point("/static", config.static_path);

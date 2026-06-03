@@ -3,9 +3,28 @@
 #include <random>
 #include <sstream>
 #include <fstream>
+#include "file_utils.h"
 
 namespace fs = std::filesystem;
 namespace haru {
+    std::string getCurrentTime_as_string() {
+        // 1. Get the current time point from the system clock
+        auto now = std::chrono::system_clock::now();
+
+        // 2. Get the duration since the Unix epoch (January 1, 1970)
+        auto duration = now.time_since_epoch();
+
+        // 3. Cast the duration to milliseconds and extract the integer count
+        auto millis = std::chrono::duration_cast<std::chrono::milliseconds>(duration).count();
+
+        // 4. Convert the millisecond numeric value to a std::string
+        std::string millis_str = std::to_string(millis);
+
+        // Output the resulting string
+        std::cout << "Milliseconds String: " << millis_str << std::endl;
+
+        return millis_str;
+    }
     void move_file(std::string source,std::string parent){
         fs::path filePath = source;
         fs::path destination;
@@ -174,5 +193,88 @@ namespace haru {
             write_to_file(current_parent,buffer);
         }
         return files_parent;
+    }
+    HaruFolder get_folder(std::string path) {
+        std::filesystem::path filePath(path);
+        HaruFolder folder;
+        folder.name = filePath.filename().string();
+        folder.parent = filePath.parent_path().string();
+        std::vector<HaruFileEntry> folders;
+        std::vector<HaruFileEntry> files;
+        try {
+            for (const auto& entry : fs::directory_iterator(path)) {
+                HaruFileEntry harufile;
+                harufile.path = entry.path().string();
+                // std::cout << "entry.path().filename().string(): " << entry.path().filename().string() << '\n';
+                harufile.name = entry.path().filename().string();
+                harufile.parent_path = entry.path().parent_path().string();
+                if (entry.is_directory()) {
+                    harufile.kind = "folder";
+                    folders.push_back(harufile);
+                } else if (entry.is_regular_file()) {
+                    harufile.kind = "file";
+                    files.push_back(harufile);
+                }
+            }
+            std::sort(folders.begin(), folders.end(), [](const auto& a, const auto& b) {
+                return a.name < b.name;
+            });
+            std::sort(files.begin(), files.end(), [](const auto& a, const auto& b) {
+                return a.name < b.name;
+            });
+            folder.files.insert(folder.files.end(), folders.begin(), folders.end());
+            folder.files.insert(folder.files.end(), files.begin(), files.end());
+        } catch (const std::filesystem::filesystem_error& e) {
+            std::cerr << "Error: " << e.what() << '\n';
+        }
+        return folder;
+    }
+    std::string get_folder_as_json(std::string path) {
+        HaruFolder files = get_folder(path);
+        nlohmann::json j = files;
+        return j.dump();
+    }
+    std::string read_binary_file_content(std::ifstream &file) {
+        std::streamsize size = file.tellg();
+        file.seekg(0, std::ios::beg);
+        std::string buffer(size, '\0');
+        if (file.read(&buffer[0], size)) {
+            return buffer;
+        }
+        return "";
+    }
+    std::string read_binary_file(const std::string& file_path_name) {
+        fs::path file_path(file_path_name);
+        std::ifstream file(file_path, std::ios::binary | std::ios::ate);
+        if (!file.is_open()) {
+            std::cerr << "Error: Unable to open file: " << file_path << std::endl;
+            return "";
+        }
+        return read_binary_file_content(file);
+    }
+    std::string get_content_type(std::string &path) {
+        std::filesystem::path filePath(path);
+        std::cout << "get_content_type::" << path << ": ext=" << filePath.extension() << std::endl;
+        if (filePath.extension() == ".jpeg") {
+            return "image/jpeg";
+        } else if (filePath.extension() == ".mov") {
+            return "video/quicktime";
+        } else if (filePath.extension() == ".mp4") {
+            return "video/mp4";
+        } else if (filePath.extension() == ".mp3") {
+            return "audio/mpeg";
+        } else if (filePath.extension() == ".html") {
+            return "text/html";
+        } else if (filePath.extension() == ".txt") {
+            return "text/html";
+        } else if (filePath.extension() == ".json") {
+            return "application/json";
+        } else if (filePath.extension() == ".xml") {
+            return "application/xml";
+        } else if (filePath.extension() == ".pdf") {
+            return "application/pdf";
+        } else {
+            return "application/octet-stream";
+        }
     }
 }

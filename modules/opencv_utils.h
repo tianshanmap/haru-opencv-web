@@ -33,7 +33,7 @@ namespace haru {
     cv::Mat *flipImage(cv::Mat &frame, int direction);
     cv::Mat *normalizeImage(cv::Mat &frame);
     void contrastImage(cv::Mat &frame, std::vector<uchar> &buffer, double alpha = 2.2, int beta = 50);
-    cv::Mat *edgePreservingImage(cv::Mat &frame);
+    cv::Mat *edgePreservingImage(cv::Mat &frame,double sigma_s,double sigma_r);
     cv::Mat *readVideo(int index, std::string &filename, std::vector<uchar> &buffer);
     void read_frame(int index, std::string &filename, cv::Mat &frame);
     int save_video(std::string &in_file, std::string &out_file);

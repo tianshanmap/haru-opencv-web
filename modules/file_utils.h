@@ -3,10 +3,23 @@
 //
 #include <iostream>
 #include <vector>
-
+#include "../include/json.hpp"
 #ifndef HARU_OPENCV_WEB_FILE_UTILS_H
 #define HARU_OPENCV_WEB_FILE_UTILS_H
 namespace haru {
+    struct HaruFileEntry {
+        std::string name;
+        std::string path;
+        std::string parent_path;
+        std::string kind;
+    };
+    struct HaruFolder {
+        std::string parent;
+        std::string name;
+        std::vector<HaruFileEntry> files;
+    };
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(HaruFileEntry, name,path,kind,parent_path)
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(HaruFolder, parent,name,files)
     int scan_directory(const std::string path,std::vector<std::string> &files,const std::string extension);
     std::vector<std::string> create_textfile_for_merge(std::vector<std::string> &files);
     int process_filesystem(std::string path,std::string destination);
@@ -14,5 +27,9 @@ namespace haru {
     void find_image_directory(std::string path,std::vector<std::string> &files);
     void clear_folder(std::string path);
     std::string create_folder_under(std::string pathname,std::string name);
+    HaruFolder get_folder(std::string path);
+    std::string get_folder_as_json(std::string path);
+    std::string read_binary_file(const std::string& file_path);
+    std::string get_content_type(std::string &path);
 }
 #endif //HARU_OPENCV_WEB_FILE_UTILS_H

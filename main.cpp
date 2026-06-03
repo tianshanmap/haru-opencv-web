@@ -41,6 +41,9 @@ int main() {
     logger.info("info");
     logger.warning("warning");
     logger.error("error");
+    // std::string folder_content = get_folder_as_json("/Users/Developer");
+    // std::cout << folder_content << std::endl;
+
     webMain(config);
     // load_video("/Users/developer/T9/document/seijin/slave.mp4","/Users/developer/T9/document/seijin/image");
     // std::vector<std::string> mov_files;
