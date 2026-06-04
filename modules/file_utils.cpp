@@ -304,4 +304,37 @@ namespace haru {
             fs::remove(entry.path());
         }
     }
+    void copy(std::string &path,std::string &target) {
+        fs::path src(path);
+        try {
+            // Move and/or rename the file
+            const auto copyOptions = fs::copy_options::recursive
+                                   | fs::copy_options::overwrite_existing;
+            fs::path targetDir(target);
+            targetDir = targetDir / src.filename();
+            fs::copy(src, targetDir, copyOptions);
+            std::cout << "File moved successfully!\n";
+        }
+        catch (const std::filesystem::filesystem_error& e) {
+            std::cerr << "Error moving file: " << e.what() << '\n';
+        }
+    }
+    void move(std::string &path,std::string &target) {
+        fs::path filePath(path);
+        fs::path targetPath(target + "/" + filePath.filename().string());
+        try {
+            // Move and/or rename the file
+            fs::rename(filePath, targetPath);
+            std::cout << "File moved successfully!\n";
+        }
+        catch (const std::filesystem::filesystem_error& e) {
+            std::cerr << "Error moving file: " << e.what() << '\n';
+            copy(path,target);
+            if (is_regular_file(filePath)) {
+                delete_file(path);
+            } else if (is_directory(filePath)) {
+                delete_folder(path);
+            }
+        }
+    }
 }

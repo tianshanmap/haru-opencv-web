@@ -510,6 +510,26 @@ namespace haru {
             // Allow requests from any frontend origin
             res.set_header("Access-Control-Allow-Origin", "*");
             res.set_content(s, "application/json"); });
+        svr.Get("/filesystem/move", [](const auto &req, auto &res)
+                {
+            auto name = req.get_param_value("name");
+            auto parent = req.get_param_value("parent");
+            std::cout << "/filesystem/move " << name << " to " << parent << std::endl;
+            move(name,parent);
+            std::string s = get_folder_as_json(parent);
+            // Allow requests from any frontend origin
+            res.set_header("Access-Control-Allow-Origin", "*");
+            res.set_content(s, "application/json"); });
+        svr.Get("/filesystem/copy", [](const auto &req, auto &res)
+                {
+            auto name = req.get_param_value("name");
+            auto parent = req.get_param_value("parent");
+            std::cout << "/filesystem/move " << name << " to " << parent << std::endl;
+            copy(name,parent);
+            std::string s = get_folder_as_json(parent);
+            // Allow requests from any frontend origin
+            res.set_header("Access-Control-Allow-Origin", "*");
+            res.set_content(s, "application/json"); });
         svr.Get("/filesystem/view", [](const auto &req, auto &res)
                 {
             auto name = req.get_param_value("name");
