@@ -496,6 +496,20 @@ namespace haru {
             // Allow requests from any frontend origin
             res.set_header("Access-Control-Allow-Origin", "*");
             res.set_content(s, "application/json"); });
+        svr.Get("/filesystem/delete", [](const auto &req, auto &res)
+                {
+            auto name = req.get_param_value("name");
+            std::filesystem::path filepath(name);
+            if (is_regular_file(filepath)) {
+                delete_file(name);
+            } else if (is_directory(filepath)) {
+                delete_folder(name);
+            }
+            auto parent = req.get_param_value("parent");
+            std::string s = get_folder_as_json(parent);
+            // Allow requests from any frontend origin
+            res.set_header("Access-Control-Allow-Origin", "*");
+            res.set_content(s, "application/json"); });
         svr.Get("/filesystem/view", [](const auto &req, auto &res)
                 {
             auto name = req.get_param_value("name");

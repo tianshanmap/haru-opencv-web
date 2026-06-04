@@ -217,10 +217,10 @@ namespace haru {
                 }
             }
             std::sort(folders.begin(), folders.end(), [](const auto& a, const auto& b) {
-                return a.name < b.name;
+                return a.name > b.name;
             });
             std::sort(files.begin(), files.end(), [](const auto& a, const auto& b) {
-                return a.name < b.name;
+                return a.name > b.name;
             });
             folder.files.insert(folder.files.end(), folders.begin(), folders.end());
             folder.files.insert(folder.files.end(), files.begin(), files.end());
@@ -275,6 +275,33 @@ namespace haru {
             return "application/pdf";
         } else {
             return "application/octet-stream";
+        }
+    }
+    void delete_file(std::string &path) {
+        fs::path filePath(path);
+        try {
+            if (fs::remove(filePath)) {
+                std::cout << "File " << path << " successfully deleted.\n";
+            } else {
+                std::cout << "File did not exist.\n";
+            }
+        } catch (const fs::filesystem_error& err) {
+            std::cerr << "Filesystem error: " << err.what() << "\n";
+        }
+    }
+    void delete_folder(std::string &path) {
+        fs::path dirPath(path);
+        try {
+            std::uintmax_t deletedCount = fs::remove_all(dirPath);
+            std::cout << "Deleted " << deletedCount << " files/folders.\n";
+        } catch (const fs::filesystem_error& err) {
+            std::cerr << "Deletion failed: " << err.what() << "\n";
+        }
+    }
+    void delete_folder_recursive(std::string path) {
+        fs::path folderPath(path);
+        for (const auto& entry : fs::recursive_directory_iterator(folderPath)) {
+            fs::remove(entry.path());
         }
     }
 }

@@ -31,5 +31,7 @@ namespace haru {
     std::string get_folder_as_json(std::string path);
     std::string read_binary_file(const std::string& file_path);
     std::string get_content_type(std::string &path);
+    void delete_file(std::string &path);
+    void delete_folder(std::string &path);
 }
 #endif //HARU_OPENCV_WEB_FILE_UTILS_H
