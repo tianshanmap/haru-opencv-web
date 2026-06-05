@@ -35,5 +35,7 @@ namespace haru {
     void delete_folder(std::string &path);
     void move(std::string &path,std::string &target);
     void copy(std::string &path,std::string &target);
+    void scanFiles(std::string &path,std::vector<std::string> &files);
+    std::string compress_folder(const std::string &path);
 }
 #endif //HARU_OPENCV_WEB_FILE_UTILS_H

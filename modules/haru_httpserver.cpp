@@ -530,6 +530,18 @@ namespace haru {
             // Allow requests from any frontend origin
             res.set_header("Access-Control-Allow-Origin", "*");
             res.set_content(s, "application/json"); });
+        svr.Get("/filesystem/download", [](const auto &req, auto &res)
+                {
+            auto name = req.get_param_value("name");
+            auto parent = req.get_param_value("parent");
+            std::cout << "/filesystem/download => " << name << std::endl;
+            std::filesystem::path filepath(name);
+            std::string zip_filename = compress_folder(name);
+            std::string content_type = get_content_type(zip_filename);
+            std::string s = read_binary_file(zip_filename);
+            // Allow requests from any frontend origin
+            res.set_header("Access-Control-Allow-Origin", "*");
+            res.set_content(s, content_type); });
         svr.Get("/filesystem/view", [](const auto &req, auto &res)
                 {
             auto name = req.get_param_value("name");

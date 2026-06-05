@@ -56,6 +56,7 @@ add_executable(opencv-web
         modules/haru_yaml.h
         modules/haru_httpserver.h
         include/json.hpp
+        include/zip_file.hpp
 )
 
 # 3. Link OpenCV libraries to your executable

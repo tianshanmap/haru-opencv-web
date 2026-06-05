@@ -77,4 +77,12 @@ int main() {
     // merge_mp3();
     // handle_photoes();
     // test();
+    // std::string path = "/Users/developer/T9/document/book/others";
+    // std::vector<std::string> files;
+    // scanFiles(path,files);
+    // for (std::string file : files) {
+    //     std::cout << file << std::endl;
+    // }
+
+    // compress_folder(path);
 }
