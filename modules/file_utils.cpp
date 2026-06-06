@@ -291,6 +291,19 @@ namespace haru {
             return "application/octet-stream";
         }
     }
+    void create_folder(std::string &name,std::string &path) {
+        fs::path folderPath(path + "/" + name);
+        if (fs::exists(folderPath)) {
+            std::cout << "Folder already exists: " << folderPath << std::endl;
+        } else {
+            if (fs::create_directories(folderPath)) {
+                std::cout << "Folder created successfully: " << folderPath << std::endl;
+            } else {
+                std::cout << "Failed to create folder: " << folderPath << std::endl;
+            }
+        }
+    }
+
     void delete_file(std::string &path) {
         fs::path filePath(path);
         try {
