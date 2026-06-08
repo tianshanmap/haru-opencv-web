@@ -29,6 +29,7 @@ namespace haru {
     std::string create_folder_under(std::string pathname,std::string name);
     HaruFolder get_folder(std::string path);
     std::string get_folder_as_json(std::string path);
+    std::string get_audio_as_json(std::string path);
     std::string read_binary_file(const std::string& file_path);
     std::string get_content_type(std::string &path);
     void create_folder(std::string &name,std::string &path);

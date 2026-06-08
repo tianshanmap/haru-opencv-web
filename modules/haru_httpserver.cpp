@@ -500,6 +500,7 @@ namespace haru {
         svr.Get("/filesystem/delete", [](const auto &req, auto &res)
                 {
             auto name = req.get_param_value("name");
+            std::cout << "/filesystem/delete " << name << std::endl;
             std::filesystem::path filepath(name);
             if (is_regular_file(filepath)) {
                 delete_file(name);
@@ -507,8 +508,13 @@ namespace haru {
                 delete_folder(name);
             }
             auto parent = req.get_param_value("parent");
+            if (parent.empty()) {
+                std::filesystem::path filepath(name);
+                parent = filepath.parent_path().string();
+            };
             std::string s = get_folder_as_json(parent);
             // Allow requests from any frontend origin
+            std::cout << "/filesystem/delete response=" << s << std::endl;
             res.set_header("Access-Control-Allow-Origin", "*");
             res.set_content(s, "application/json"); });
         svr.Get("/filesystem/move", [](const auto &req, auto &res)
@@ -585,6 +591,14 @@ namespace haru {
             // Allow requests from any frontend origin
             res.set_header("Access-Control-Allow-Origin", "*");
             res.set_content(buffer, content_type); });
+
+        svr.Get("/filesystem/video/audio_list", [config](const auto &req, auto &res)
+                {
+            std::string audio_path = config.media_audio_path;
+            std::string s = get_audio_as_json(audio_path);
+            // Allow requests from any frontend origin
+            res.set_header("Access-Control-Allow-Origin", "*");
+            res.set_content(s, "application/json"); });
 
         // Set static files
         svr.set_mount_point("/static", config.static_path);

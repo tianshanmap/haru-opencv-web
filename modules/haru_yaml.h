@@ -17,6 +17,9 @@ namespace haru {
         std::string host;
         int port;
         std::string static_path;
+        std::string media_audio_path;
+        std::string media_audio_workspace;
+        std::string media_video_export;
         void load_yaml() {
             try {
                 // Load the file into a Node object
@@ -29,6 +32,11 @@ namespace haru {
                     media_mp3_path = config["photoes"]["media_mp3_path"].as<std::string>();
                     media_mp3_path_export = config["photoes"]["media_mp3_path_export"].as<std::string>();
                     final_photoes_export = config["photoes"]["final_photoes_export"].as<std::string>();
+                }
+                if (config["media"]) {
+                    media_audio_path = config["media"]["audio_path"].as<std::string>();
+                    media_audio_workspace = config["media"]["audio_workspace"].as<std::string>();
+                    media_video_export = config["media"]["video_export"].as<std::string>();
                 }
                 if (config["web"]) {
                     host = config["web"]["host"].as<std::string>();
