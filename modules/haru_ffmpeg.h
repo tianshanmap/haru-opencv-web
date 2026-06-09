@@ -59,12 +59,11 @@ namespace haru {
             return ss.str();
         };
         //function returns merged mp3 filename
-        std::string merge_mp3() {
+        std::string merge_mp3(std::string &mp3_path,std::vector<std::string> &mp3_files) {
             std::filesystem::path mpath(mp3_path);
             if (!exists(mpath)) {
                 std::filesystem::create_directory(mpath);
             }
-            std::vector<std::string> mp3_files = select_mp3();
             std::string output = getOutput(mp3_files);
             std::cout << "merge_mp3::output => " << output << std::endl;
             std::ofstream out(output, std::ios::binary);
@@ -78,6 +77,10 @@ namespace haru {
             }
             out.close();
             return output;
+        }
+        std::string merge_mp3() {
+            std::vector<std::string> mp3_files = select_mp3();
+            return merge_mp3(mp3_path,mp3_files);
         }
     };
     struct HaruFFMpegMergeCMD {
@@ -126,7 +129,9 @@ namespace haru {
     };
     // bool concatMP3(const std::string& file1,const std::string& file2,const std::string& output);
     // void concatenateMP3(const std::string& file1, const std::string& file2, const std::string& output);
+    std::string concatenate_mp3(std::string &mp3_workspace,std::vector<std::string> &mp3_files);
     void add_mp3_to_mp4(std::string mp3,std::string mp4,std::string output);
+    void add_mp3_to_mp4(std::string mp3,std::string mp4);
     void combine_video(std::vector<std::string> files,std::string output_path,std::string ext);
     void convert_mov_mp4(std::string mov,std::string mp4);
 }

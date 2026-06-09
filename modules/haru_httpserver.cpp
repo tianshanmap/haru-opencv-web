@@ -6,6 +6,9 @@
 #include "haru_httpserver.h"
 
 #include "file_utils.h"
+#include "haru_ffmpeg.h"
+#include "haru_http_handlers.h"
+#include "haru_service.h"
 #include "simplelogger/simple_logger.hpp"
 
 namespace haru {
@@ -17,6 +20,13 @@ namespace haru {
         httplib::Server http_server;
         HaruHttpServer svr(&http_server);
 
+        // 1. Handle the CORS Preflight (OPTIONS request)
+        svr.Options(R"(/.*)", [](const httplib::Request& req, httplib::Response&res) {
+            res.set_header("Access-Control-Allow-Origin", "*"); // Or your specific domain
+            res.set_header("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE");
+            res.set_header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+            res.status = 200;
+        });
         // http GET
         svr.Get("/static", [](const httplib::Request &req, httplib::Response &res)
                 {
@@ -599,6 +609,39 @@ namespace haru {
             // Allow requests from any frontend origin
             res.set_header("Access-Control-Allow-Origin", "*");
             res.set_content(s, "application/json"); });
+
+        // svr.Options("/filesystem/video/generate", [](const auto &req, auto &res) {
+        //     res.set_header("Access-Control-Allow-Methods", "POST, OPTIONS,GET");
+        //     res.set_header("Access-Control-Allow-Origin", "*");
+        //     res.status = 200;
+        // });
+        svr.Post("/filesystem/video/generate", [config](const auto &req, auto &res)
+                {
+            if (req.has_header("Content-Type") && req.get_header_value("Content-Type") != "application/json") {
+                res.status = 400;
+                res.set_content(R"({"error": "Content-Type must be application/json"})", "application/json");
+                return;
+            }
+            VideoCreateRequest video_create_request = get_video_create_request(req);
+            std::cout << "video_create_request(image_path)=" << video_create_request.image_path << std::endl;
+            std::cout << "video_create_request(video_name)=" << video_create_request.video_name << std::endl;
+            std::cout << "video_export=" << config.media_video_export << std::endl;
+            if (!video_create_request.audio_files.empty()) {
+                for (auto audio_file : video_create_request.audio_files) {
+                    std::cout << "audio_file=" << audio_file << std::endl;
+                }
+            };
+            std::string audio_path = config.media_audio_path;
+            std::string audio_workspace_path = config.media_audio_workspace;
+            std::string mp3_name = concatenate_mp3(audio_workspace_path, video_create_request.audio_files);
+            std::string video_export = config.media_video_export + "/" + video_create_request.video_name + ".mp4";
+            std::string response = harusvc::create_video(video_create_request.image_path,
+                mp3_name,
+                video_export);
+            std::string s = get_folder_as_json(config.media_video_export);
+            // Allow requests from any frontend origin
+            res.set_header("Access-Control-Allow-Origin", "*");
+            res.set_content(response, "application/json"); });
 
         // Set static files
         svr.set_mount_point("/static", config.static_path);

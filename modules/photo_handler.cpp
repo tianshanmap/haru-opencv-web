@@ -104,6 +104,8 @@ namespace haru {
         cv::putText(frame, text, org, fontFace, fontScale, color, thickness, lineType);
     }
     void process_photoes(std::string path,std::string videoFile){
+        std::cout << "process_photoes::path => " << path << std::endl;
+        std::cout << "process_photoes::videoFile => " << videoFile << std::endl;
         HaruRandom haru_random(1,9);
         std::vector<std::string> files = getFiles(path,".jpeg");
         std::cout << "Total jpeg files to be handled => " << files.size() << std::endl;
@@ -185,7 +187,7 @@ namespace haru {
         }
         output.release();
         cv::destroyAllWindows();
-        std::cout << "Write video to  => " << videoFile << std::endl;
+        std::cout << "process_photoes::Write video to  => " << videoFile << std::endl;
     }
 
     std::vector<std::string> make_video_from_photoes(std::string source,std::string export_path) {
@@ -201,7 +203,6 @@ namespace haru {
             // std::cout << "Process export directory => " << export_path << std::endl;
             std::filesystem::path filepath(file);
             std::cout << "Process filepath => " << filepath.filename() << std::endl;
-            // process_photoes(file,export_path + "/" + filepath.parent_path().filename().string() + ".mp4");
             std::string export_mp4_file = export_path + "/" + filepath.parent_path().filename().string() + ".mp4";
             export_mp4_files.push_back(export_mp4_file);
             std::thread th(process_photoes,file,export_mp4_file);

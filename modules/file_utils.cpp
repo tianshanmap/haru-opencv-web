@@ -373,6 +373,11 @@ namespace haru {
             }
         }
     }
+    void rename(std::string &file1,std::string &file2) {
+        fs::path filePath1(file1);
+        fs::path filePath2(file2);
+        fs::rename(filePath1, filePath2);
+    }
     std::string get_file_name(std::string &parent_path,std::string file_path) {
         return file_path.substr(parent_path.size() + 1);
     }
@@ -391,4 +396,5 @@ namespace haru {
         zipfile.save(zipFilePath);
         return zipFilePath.string();
     }
+    
 }

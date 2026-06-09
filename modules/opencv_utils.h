@@ -1,7 +1,7 @@
 //
 // Created by developer on 2026-05-19.
 //
-
+#include <filesystem>
 #ifndef HARU_OPENCV_WEB_OPENCV_UTILS_H
 #define HARU_OPENCV_WEB_OPENCV_UTILS_H
 #include <opencv2/opencv.hpp>
