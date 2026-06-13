@@ -6,6 +6,7 @@
 #define HARU_OPENCV_WEB_PHOTO_HANDLER_H
 namespace haru {
     void process_photoes(std::string path,std::string videoFile);
+    void process_photoes_v1(std::vector<std::string> &files,std::string videoFile);
     void create_video(YamlConfig &config);
     std::vector<std::string> make_video_from_photoes(std::string source,std::string export_path);
 }

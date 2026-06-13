@@ -610,6 +610,13 @@ namespace haru {
             res.set_header("Access-Control-Allow-Origin", "*");
             res.set_content(s, "application/json"); });
 
+        svr.Get("/filesystem/video/image_list", [config](const auto &req, auto &res)
+                {
+            auto image_path = req.get_param_value("name");
+            std::string s = get_image_as_json(image_path);
+            // Allow requests from any frontend origin
+            res.set_header("Access-Control-Allow-Origin", "*");
+            res.set_content(s, "application/json"); });
         // svr.Options("/filesystem/video/generate", [](const auto &req, auto &res) {
         //     res.set_header("Access-Control-Allow-Methods", "POST, OPTIONS,GET");
         //     res.set_header("Access-Control-Allow-Origin", "*");
@@ -642,6 +649,55 @@ namespace haru {
             // Allow requests from any frontend origin
             res.set_header("Access-Control-Allow-Origin", "*");
             res.set_content(response, "application/json"); });
+        svr.Post("/filesystem/video/generate/v1", [config](const auto &req, auto &res)
+                {
+            if (req.has_header("Content-Type") && req.get_header_value("Content-Type") != "application/json") {
+                res.status = 400;
+                res.set_content(R"({"error": "Content-Type must be application/json"})", "application/json");
+                return;
+            }
+            VideoCreateRequestV1 video_create_request = get_video_create_request_v1(req);
+            std::cout << "video_create_request(image_path)=" << video_create_request.image_path << std::endl;
+            std::cout << "video_create_request(audio_name)=" << video_create_request.audio_name << std::endl;
+            std::cout << "video_create_request(video_name)=" << video_create_request.video_name << std::endl;
+            std::cout << "video_export=" << config.media_video_export << std::endl;
+            if (!video_create_request.image_files.empty()) {
+                for (auto image_file : video_create_request.image_files) {
+                    std::cout << "image_file=" << image_file << std::endl;
+                }
+            };
+            // std::string audio_path = config.media_audio_path;
+            // std::string audio_workspace_path = config.media_audio_workspace;
+            // std::string mp3_name = concatenate_mp3(audio_workspace_path, video_create_request.audio_files);
+            std::string video_export = config.media_video_export + "/" + video_create_request.video_name + ".mp4";
+            video_create_request.video_name = video_export;
+            std::string response = harusvc::create_video_v1(video_create_request);
+            // std::string s = get_folder_as_json(config.media_video_export);
+            // Allow requests from any frontend origin
+            res.set_header("Access-Control-Allow-Origin", "*");
+            res.set_content(response, "application/json"); });
+        svr.Post("/filesystem/audio/generate", [config](const auto &req, auto &res)
+                {
+            if (req.has_header("Content-Type") && req.get_header_value("Content-Type") != "application/json") {
+                res.status = 400;
+                res.set_content(R"({"error": "Content-Type must be application/json"})", "application/json");
+                return;
+            }
+            AudioCreateRequest audio_create_request = get_audio_create_request(req);
+            if (!audio_create_request.audio_files.empty()) {
+                for (auto audio_file : audio_create_request.audio_files) {
+                    std::cout << "audio_file=" << audio_file << std::endl;
+                }
+            };
+            std::string audio_path = config.media_audio_path;
+            std::string audio_workspace_path = config.media_audio_workspace;
+            std::string mp3_name = concatenate_mp3(audio_workspace_path, audio_create_request.audio_files);
+            AudioCreateResponse response;
+            response.name = mp3_name;
+            std::string s = get_audio_create_response(response);
+            // Allow requests from any frontend origin
+            res.set_header("Access-Control-Allow-Origin", "*");
+            res.set_content(s, "application/json"); });
 
         // Set static files
         svr.set_mount_point("/static", config.static_path);

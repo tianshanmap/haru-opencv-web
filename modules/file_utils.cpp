@@ -255,6 +255,15 @@ namespace haru {
         nlohmann::json j = files;
         return j.dump();
     }
+    std::string get_image_as_json(std::string path) {
+        HaruFolder files = get_folder(path);
+        std::vector<HaruFileEntry> audio_files = files.files;
+        files.files.clear();
+        auto audio_files_filter = audio_files | std::views::filter([](const auto& file) { return file.kind == "file" && (file.name.ends_with(".jpeg") || file.name.ends_with(".jpg")); });
+        files.files.insert(files.files.end(), audio_files_filter.begin(), audio_files_filter.end());
+        nlohmann::json j = files;
+        return j.dump();
+    }
     std::string read_binary_file_content(std::ifstream &file) {
         std::streamsize size = file.tellg();
         file.seekg(0, std::ios::beg);

@@ -189,6 +189,88 @@ namespace haru {
         cv::destroyAllWindows();
         std::cout << "process_photoes::Write video to  => " << videoFile << std::endl;
     }
+    void process_photoes_v1(std::vector<std::string> &files,std::string videoFile){
+        std::cout << "Total jpeg files to be handled => " << files.size() << std::endl;
+        cv::VideoWriter output(videoFile, HARU_CODEC, HARU_FPS, HARU_IMAGE_SIZE);
+        HaruRandom haru_random(1,5);
+        for (std::string file : files) {
+            cv::Mat frame = cv::imread(file);
+            // std::cout << "Handle file=> " << file << ",size=" << frame.size << std::endl;
+            // cv::Mat resized_img;
+            // Resize to 300x200 (Width x Height)
+            // cv::resize(frame, resized_img, HARU_IMAGE_SIZE);
+            cv::Mat *resized_img = resize_image(frame,HARU_SCALE,HARU_FRAME_WIDTH,HARU_FRAME_HEIGHT);
+            // for (int i = 20; i >= 0; i=i-10) {
+            //     rotate_frame(output,resized_img,i,1);
+            // }
+            // flip_frame_horizentally(output,resized_img,2);
+            // for (int i = -20; i < 0; i=i+10) {
+            //     rotate_frame(output,resized_img,i,1);
+            // }
+            int my_rd = haru_random.getRandom();
+            // std::cout << "Random Number => " << my_rd << std::endl;
+            switch (my_rd) {
+                case 1:
+                    repeat_frame(output,*resized_img,1);
+                    for (double i = 0; i <= 400.0; i=i+20.0) {
+                        output_shift_frame_horizentally(output,*resized_img,i);
+                    }
+                    repeat_frame(output,*resized_img,5);
+                    break;
+                case 2:
+                    repeat_frame(output,*resized_img,1);
+                    for (double i = 400; i > 0; i=i-20.0) {
+                        output_shift_frame_horizentally(output,*resized_img,i);
+                    }
+                    repeat_frame(output,*resized_img,5);
+                    break;
+                case 3:
+                    repeat_frame(output,*resized_img,1);
+                    for (double i = 0; i <= 190.0; i=i+10.0) {
+                        output_shift_frame_vertically(output,*resized_img,i);
+                        // skin_smooth(frame,resized_img);
+                        // output << resized_img;
+                    }
+                    repeat_frame(output,*resized_img,5);
+                    break;
+                case 4:
+                    contrast_frame(output,*resized_img,20);
+                    repeat_frame(output,*resized_img,5);
+                    break;
+                case 5:
+                    contrast_frame(output,*resized_img,20);
+                    repeat_frame(output,*resized_img,5);
+                    break;
+                    // case 5:
+                //     repeat_frame(output,*resized_img,20);
+                //     break;
+                case 6:
+                    for (int i = 90; i >= 0; i=i-10) {
+                        rotate_frame(output,*resized_img,i,1);
+                    }
+                    repeat_frame(output,*resized_img,20);
+                    break;
+                case 7:
+                    for (int i = -90; i < 0; i=i+10) {
+                        rotate_frame(output,*resized_img,i,1);
+                    }
+                    repeat_frame(output,*resized_img,20);
+                    break;
+                case 8:
+                    blur_frame(output,*resized_img,10);
+                    repeat_frame(output,*resized_img,20);
+                    break;
+                case 9:
+                    blur_frame(output,*resized_img,10);
+                    repeat_frame(output,*resized_img,20);
+                    break;
+            }
+            delete resized_img;
+        }
+        output.release();
+        cv::destroyAllWindows();
+        std::cout << "process_photoes::Write video to  => " << videoFile << std::endl;
+    }
 
     std::vector<std::string> make_video_from_photoes(std::string source,std::string export_path) {
         std::vector<std::string> export_mp4_files;
