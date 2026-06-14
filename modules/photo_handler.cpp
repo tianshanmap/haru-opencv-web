@@ -9,6 +9,7 @@
 #include "haru_random.h"
 #include "haru_ffmpeg.h"
 #include "haru_yaml.h"
+#include "web_models.h"
 
 namespace haru {
     const double HARU_SCALE = 0.4;
@@ -189,26 +190,17 @@ namespace haru {
         cv::destroyAllWindows();
         std::cout << "process_photoes::Write video to  => " << videoFile << std::endl;
     }
-    void process_photoes_v1(std::vector<std::string> &files,std::string videoFile){
+    void process_photoes_v1(VideoProcessRequest &request){
+        std::vector<std::string> files = request.files;
+        std::string videoFile = request.videoFile;
+        int haruCodec = CV_FOURCC(request.haruCodec[0],request.haruCodec[1],request.haruCodec[2],request.haruCodec[3]);
         std::cout << "Total jpeg files to be handled => " << files.size() << std::endl;
-        cv::VideoWriter output(videoFile, HARU_CODEC, HARU_FPS, HARU_IMAGE_SIZE);
+        cv::VideoWriter output(videoFile, HARU_CODEC, request.fps, cv::Size(request.width,request.height));
         HaruRandom haru_random(1,5);
         for (std::string file : files) {
             cv::Mat frame = cv::imread(file);
-            // std::cout << "Handle file=> " << file << ",size=" << frame.size << std::endl;
-            // cv::Mat resized_img;
-            // Resize to 300x200 (Width x Height)
-            // cv::resize(frame, resized_img, HARU_IMAGE_SIZE);
-            cv::Mat *resized_img = resize_image(frame,HARU_SCALE,HARU_FRAME_WIDTH,HARU_FRAME_HEIGHT);
-            // for (int i = 20; i >= 0; i=i-10) {
-            //     rotate_frame(output,resized_img,i,1);
-            // }
-            // flip_frame_horizentally(output,resized_img,2);
-            // for (int i = -20; i < 0; i=i+10) {
-            //     rotate_frame(output,resized_img,i,1);
-            // }
+            cv::Mat *resized_img = resize_image(frame,request.scale,request.width,request.height);
             int my_rd = haru_random.getRandom();
-            // std::cout << "Random Number => " << my_rd << std::endl;
             switch (my_rd) {
                 case 1:
                     repeat_frame(output,*resized_img,1);

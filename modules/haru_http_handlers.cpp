@@ -1,3 +1,4 @@
+#include <stdexcept> // Required for standard exceptions
 #include "web_models.h"
 #include "../include/json.hpp"
 #include "../include/httplib.hpp"
@@ -15,10 +16,25 @@ namespace haru {
     VideoCreateRequestV1 get_video_create_request_v1(const httplib::Request &req) {
         json incoming_json = json::parse(req.body);
         VideoCreateRequestV1 request;
-        request.image_path = incoming_json["image_path"];
-        request.audio_name = incoming_json["audio_name"];
-        request.video_name = incoming_json["video_name"];
-        request.image_files = incoming_json["image_files"];
+        try {
+            request.image_path = incoming_json["image_path"];
+            request.audio_name = incoming_json["audio_name"];
+            request.video_name = incoming_json["video_name"];
+            request.image_files = incoming_json["image_files"];
+            request.fps = incoming_json["fps"];
+            request.scale = incoming_json["scale"];
+            request.width = incoming_json["width"];
+            request.height = incoming_json["height"];
+            std::string codec = incoming_json["codec"];
+            request.haruCodec[0] = codec[0];
+            request.haruCodec[1] = codec[1];
+            request.haruCodec[2] = codec[2];
+            request.haruCodec[3] = codec[3];
+        }
+        catch (const std::exception& e) {
+            std::cout << "Error*****" << std::endl;   // Code to handle the specific exception
+            std::cout << e.what() << std::endl;   // Code to handle the specific exception
+        }
         return request;
     }
     AudioCreateRequest get_audio_create_request(const httplib::Request &req) {

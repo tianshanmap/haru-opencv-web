@@ -651,11 +651,13 @@ namespace haru {
             res.set_content(response, "application/json"); });
         svr.Post("/filesystem/video/generate/v1", [config](const auto &req, auto &res)
                 {
+            std::cout << "/filesystem/video/generate/v1 called" << std::endl;
             if (req.has_header("Content-Type") && req.get_header_value("Content-Type") != "application/json") {
                 res.status = 400;
                 res.set_content(R"({"error": "Content-Type must be application/json"})", "application/json");
                 return;
             }
+            std::cout << "/filesystem/video/generate/v1 creating request..." << std::endl;
             VideoCreateRequestV1 video_create_request = get_video_create_request_v1(req);
             std::cout << "video_create_request(image_path)=" << video_create_request.image_path << std::endl;
             std::cout << "video_create_request(audio_name)=" << video_create_request.audio_name << std::endl;

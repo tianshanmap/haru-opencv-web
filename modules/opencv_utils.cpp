@@ -10,6 +10,9 @@ int g_slider_position = 0;
 int g_run = 1, g_dontset = 0; //start out in single step mode
 cv::VideoCapture g_cap;
 namespace haru {
+    /*To convert mp4 to webm(50% compression rate)
+     *ffmpeg -i x002.mp4 -c:v libvpx-vp9 -crf 30 -b:v 0 -c:a libopus output.webm
+     */
     const cv::Scalar BACKGROUND_COLOR = cv::Scalar(135, 206, 235);
     HaruRandom haru_random(1,5);
     std::string getVideo()
@@ -465,7 +468,19 @@ namespace haru {
         // 4. Create an output matrix with the same size and type as the source
         cv::Mat *shiftedImage = new cv::Mat();
         // 5. Apply the affine transformation
-        cv::warpAffine(frame, *shiftedImage, M, frame.size());
+        // Example: Bright Green is Blue=0, Green=255, Red=0
+        cv::Scalar backgroundColor(255, 255, 255);
+        // cv::warpAffine(frame, *shiftedImage, M, frame.size());
+        cv::warpAffine(
+            frame,
+            *shiftedImage,
+            M,
+            frame.size(),
+            cv::INTER_LINEAR,
+            cv::BORDER_CONSTANT, // Tells OpenCV to use a constant color for borders
+            backgroundColor      // Passes your custom color scalar
+        );
+
         return shiftedImage;
     }
     cv::Mat *shift_frame_vertically(cv::Mat &frame,double shift) {
@@ -563,16 +578,21 @@ namespace haru {
         uchar blue = intensity.val[0];
         uchar green = intensity.val[1];
         uchar red = intensity.val[2];
+        // return cv::Scalar(blue, green, red);
         return cv::Scalar(blue, green, red);
     }
     cv::Mat *resize_image(cv::Mat src,double scale,int bgWidth,int bgHeight) {
         // 1. Define the size of the background image and create it (e.g., black background)
         // cv::Mat background = cv::Mat::zeros(bgHeight, bgWidth, CV_8UC3);
         // cv::Mat *background = new cv::Mat(cv::Mat(bgHeight, bgWidth, CV_8UC3, BACKGROUND_COLOR));
+        int source_height = src.rows; // Height of the image
+        int source_width = src.cols;
+        double _scale = static_cast<double>(bgWidth) / src.cols;
+        int targetHeight = cvRound(src.rows * _scale);
         cv::Mat *background = new cv::Mat(cv::Mat(bgHeight, bgWidth, CV_8UC3, getMatColor(src)));
         // 2. Load the image you want to place
         cv::Mat scaledImage;
-        cv::resize(src, scaledImage, cv::Size(), scale, scale, cv::INTER_LINEAR);
+        cv::resize(src, scaledImage, cv::Size(bgWidth,targetHeight), 0,0, cv::INTER_CUBIC);
         // 3. Define where you want to place the image (top-left coordinates)
 
         int scaledImage_width = scaledImage.cols;
