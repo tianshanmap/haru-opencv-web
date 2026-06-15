@@ -20,6 +20,8 @@ namespace haru {
         std::string media_audio_path;
         std::string media_audio_workspace;
         std::string media_video_export;
+        std::string upload_target_path;
+        int upload_max_size;
         void load_yaml() {
             try {
                 // Load the file into a Node object
@@ -42,6 +44,10 @@ namespace haru {
                     host = config["web"]["host"].as<std::string>();
                     static_path = config["web"]["static_path"].as<std::string>();
                     port = config["web"]["port"].as<int>();
+                }
+                if (config["upload"]) {
+                    upload_target_path = config["upload"]["target_path"].as<std::string>();
+                    upload_max_size = config["upload"]["max_size"].as<int>();
                 }
             } catch (const YAML::Exception& e) {
                 std::cerr << "YAML Error: " << e.what() << std::endl;

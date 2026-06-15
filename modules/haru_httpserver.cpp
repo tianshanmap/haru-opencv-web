@@ -592,6 +592,56 @@ namespace haru {
             res.set_header("Access-Control-Allow-Origin", "*");
             res.set_content(content, "text/plain"); });
 
+        svr.Get("/filesystem/upload_target_path", [config](const auto &req, auto &res)
+                {
+            std::string content_type = "text/html";
+            // Allow requests from any frontend origin
+            res.set_header("Access-Control-Allow-Origin", "*");
+            res.set_content(get_upload_target_path(config), content_type); });
+        svr.Post("/filesystem/upload_unpack", [](const auto &req, auto &res){
+            auto f = req.form.get_file("file");
+            std::string target = req.form.get_field("target");
+            std::cout << "/filesystem/upload target => " << target << std::endl;
+            auto content = f.filename + " (" + std::to_string(f.content.size()) + " bytes)";
+            std::cout << "/filesystem/upload content => " << content << std::endl;
+            std::cout << "Receiving file: " << f.filename << "\n";
+            std::cout << "Content-Type: " << f.content_type << "\n";
+            std::cout << "Size: " << f.content.size() << " bytes\n";
+            std::filesystem::path targetpath(target);
+            std::string filepath = targetpath.string() + "/" + f.filename;
+            std::ofstream out_file(filepath, std::ios::out | std::ios::binary);
+            if (!out_file) {
+               res.status = 500;
+               res.set_content("Failed to create local file on server.", "text/plain");
+               return;
+           }
+            out_file.write(f.content.data(), f.content.size());
+            out_file.close();
+            res.set_header("Access-Control-Allow-Origin", "*");
+            res.set_content(content, "text/plain"); });
+        svr.Post("/filesystem/upload_chunk", [](const auto &req, auto &res){
+            auto f = req.form.get_file("fileChunk");
+            std::string filename = req.form.get_field("filename");
+            std::string target = req.form.get_field("target");
+            std::string index = req.form.get_field("chunkIndex");
+            std::string totalChunks = req.form.get_field("totalChunks");
+            auto content = f.filename + " (" + std::to_string(f.content.size()) + " bytes)";
+            std::cout << "/filesystem/upload content => " << content << std::endl;
+            std::cout << "Content-Type: " << f.content_type << "\n";
+            std::cout << "Size: " << f.content.size() << " bytes\n";
+            std::filesystem::path targetpath(target);
+            std::string filepath = targetpath.string() + "/" + filename;
+            std::ofstream out_file(filepath, std::ios::app | std::ios::binary);
+            if (!out_file) {
+               res.status = 500;
+               res.set_content("Failed to create local file on server.", "text/plain");
+               return;
+           }
+            out_file.write(f.content.data(), f.content.size());
+            out_file.close();
+            res.set_header("Access-Control-Allow-Origin", "*");
+            res.set_content(content, "text/plain"); });
+
         svr.Get("/filesystem/view", [](const auto &req, auto &res)
                 {
             auto name = req.get_param_value("name");
@@ -701,7 +751,6 @@ namespace haru {
             res.set_header("Access-Control-Allow-Origin", "*");
             res.set_content(s, "application/json"); });
 
-        // Set static files
         svr.set_mount_point("/static", config.static_path);
         svr.start(config.host, config.port);
         return 0; // Returning 0 indicates the program finished successfully

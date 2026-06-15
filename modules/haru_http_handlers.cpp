@@ -1,4 +1,6 @@
 #include <stdexcept> // Required for standard exceptions
+
+#include "haru_yaml.h"
 #include "web_models.h"
 #include "../include/json.hpp"
 #include "../include/httplib.hpp"
@@ -47,6 +49,13 @@ namespace haru {
     std::string get_audio_create_response(AudioCreateResponse &response) {
         nlohmann::json j = response;
         return j.dump();
+    }
+    std::string get_upload_target_path(const YamlConfig &config) {
+        nlohmann::json response = {
+            {"path", config.upload_target_path},
+            {"max_size", config.upload_max_size},
+          };
+        return response.dump();
     }
 
 }
