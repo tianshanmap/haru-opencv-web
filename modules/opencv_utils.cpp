@@ -424,8 +424,7 @@ namespace haru {
                 MJPG: This codec compresses each frame as a JPEG image, which is simple and fast but can lead to larger files.
                 H264: Widely used and highly efficient, providing excellent compression with high-quality output, commonly used in .mp4 files.
         */
-        // cv::VideoWriter output(out_file, CV_FOURCC('m','p','4','v'), 30, S);
-        cv::VideoWriter output(out_file, CV_FOURCC('D', 'I', 'V', 'X'), 20, S);
+        cv::VideoWriter output(out_file, cv::VideoWriter::fourcc('D', 'I', 'V', 'X'), 20, S);
 
         cv::Mat frame;
         cv::Mat frame_target;

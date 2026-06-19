@@ -16,7 +16,7 @@ namespace haru {
     const int HARU_FRAME_WIDTH = 1512;
     const int HARU_FRAME_HEIGHT = 1024;
     const cv::Size HARU_IMAGE_SIZE = cv::Size(HARU_FRAME_WIDTH,HARU_FRAME_HEIGHT);
-    const int HARU_CODEC = CV_FOURCC('a', 'v', 'c', '1');
+    const int HARU_CODEC = cv::VideoWriter::fourcc('a', 'v', 'c', '1');
     const int HARU_FPS = 5;
 
     void flip_frame_horizentally(cv::VideoWriter &output,cv::Mat &frame,int repeat) {
@@ -193,7 +193,6 @@ namespace haru {
     void process_photoes_v1(VideoProcessRequest &request){
         std::vector<std::string> files = request.files;
         std::string videoFile = request.videoFile;
-        int haruCodec = CV_FOURCC(request.haruCodec[0],request.haruCodec[1],request.haruCodec[2],request.haruCodec[3]);
         std::cout << "Total jpeg files to be handled => " << files.size() << std::endl;
         cv::VideoWriter output(videoFile, HARU_CODEC, request.fps, cv::Size(request.width,request.height));
         HaruRandom haru_random(1,5);
