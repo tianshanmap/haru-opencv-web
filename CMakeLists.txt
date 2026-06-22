@@ -56,7 +56,6 @@ add_executable(opencv-web
         modules/haru_yaml.h
         modules/haru_httpserver.h
         include/json.hpp
-        include/zip_file.hpp
         modules/web_models.h
         modules/haru_http_handlers.cpp
         modules/haru_http_handlers.h

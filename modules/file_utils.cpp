@@ -4,7 +4,6 @@
 #include <sstream>
 #include <fstream>
 #include "file_utils.h"
-#include "../include/zip_file.hpp" // Include miniz-cpp header
 
 namespace fs = std::filesystem;
 namespace haru {
@@ -390,20 +389,5 @@ namespace haru {
     std::string get_file_name(std::string &parent_path,std::string file_path) {
         return file_path.substr(parent_path.size() + 1);
     }
-    std::string compress_folder(const std::string &path) {
-        // Create zip archive
-        fs::path zipFilePath(path + ".zip");
-        std::vector<std::string> files;
-        std::string parent = path;
-        scanFiles(parent,files);
-        miniz_cpp::zip_file zipfile;
-        for (auto &file : files) {
-            std::string buffer = read_binary_file(file);
-            std::string name = get_file_name(parent,file);
-            zipfile.writestr(name,buffer);
-        }
-        zipfile.save(zipFilePath);
-        return zipFilePath.string();
-    }
-    
+
 }
