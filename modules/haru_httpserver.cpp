@@ -648,6 +648,14 @@ namespace haru {
             res.set_header("Access-Control-Allow-Origin", "*");
             res.set_content(s, "application/json"); });
 
+        svr.Get("/filesystem/video/export_list", [config](const auto &req, auto &res)
+                {
+            std::string audio_path = config.media_video_export;
+            std::string s = get_video_as_json(audio_path);
+            // Allow requests from any frontend origin
+            res.set_header("Access-Control-Allow-Origin", "*");
+            res.set_content(s, "application/json"); });
+
         svr.Get("/filesystem/video/image_list", [config](const auto &req, auto &res)
                 {
             auto image_path = req.get_param_value("name");
