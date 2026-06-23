@@ -32,8 +32,13 @@ void test() {
 
 }
 
-int main() {
-    YamlConfig config{.yaml_path="../config/application.yaml"};
+int main(int argc, char* argv[]) {
+    if (argc < 2) {
+        std::cout << "Usage: " << argv[0] << " config_file_path" << std::endl;
+        return 1;
+    }
+    // YamlConfig config{.yaml_path="../config/application.yaml"};
+    YamlConfig config{.yaml_path=argv[1]};
     config.load_yaml();
     SimpleLogger &logger = SimpleLogger::getInstance();
     logger.configure("../log/log.txt",LogLevel::INFO);
