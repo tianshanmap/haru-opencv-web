@@ -1,8 +1,8 @@
 //
 // Created by developer on 2026-05-19.
 //
-#include <iostream>
 #include <vector>
+#include <chrono>
 #include "../include/json.hpp"
 #ifndef HARU_OPENCV_WEB_FILE_UTILS_H
 #define HARU_OPENCV_WEB_FILE_UTILS_H
@@ -12,13 +12,15 @@ namespace haru {
         std::string path;
         std::string parent_path;
         std::string kind;
+        unsigned long size;
+        std::string last_update;
     };
     struct HaruFolder {
         std::string parent;
         std::string name;
         std::vector<HaruFileEntry> files;
     };
-    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(HaruFileEntry, name,path,kind,parent_path)
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(HaruFileEntry, name,path,kind,parent_path,size,last_update)
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(HaruFolder, parent,name,files)
     int scan_directory(const std::string path,std::vector<std::string> &files,const std::string extension);
     std::vector<std::string> create_textfile_for_merge(std::vector<std::string> &files);
@@ -41,5 +43,6 @@ namespace haru {
     void copy(std::string &path,std::string &target);
     void scanFiles(std::string &path,std::vector<std::string> &files);
     void rename(std::string &file1,std::string &file2);
+    std::string getLastWriteTimeStr(const std::filesystem::path& filePath);
 }
 #endif //HARU_OPENCV_WEB_FILE_UTILS_H

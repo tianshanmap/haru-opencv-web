@@ -205,6 +205,31 @@ namespace haru {
         }
         return files_parent;
     }
+    std::string getLastWriteTimeStr(const std::filesystem::path& filePath) {
+        auto fileTime = std::filesystem::last_write_time(filePath);
+
+        // Convert file_time_type to system_clock time_point
+        auto systemTime = std::chrono::time_point_cast<std::chrono::system_clock::duration>(
+            fileTime - std::filesystem::file_time_type::clock::now() + std::chrono::system_clock::now()
+        );
+
+        // Convert to time_t for old C-style time parsing
+        std::time_t cTime = std::chrono::system_clock::to_time_t(systemTime);
+
+        // Thread-safe conversion to local time structure
+        std::tm localTime;
+#if defined(_MSC_VER)
+        localtime_s(&localTime, &cTime); // Windows
+#else
+        localtime_r(&cTime, &localTime); // POSIX/Linux
+#endif
+
+        // Format the time structure via a stringstream
+        std::ostringstream oss;
+        oss << std::put_time(&localTime, "%Y-%m-%d %H:%M:%S");
+        return oss.str();
+    }
+
     HaruFolder get_folder(std::string path) {
         std::filesystem::path filePath(path);
         HaruFolder folder;
@@ -224,6 +249,9 @@ namespace haru {
                     folders.push_back(harufile);
                 } else if (entry.is_regular_file()) {
                     harufile.kind = "file";
+                    harufile.size = entry.file_size();
+                    harufile.last_update = getLastWriteTimeStr(entry);
+                    std::cout << "get_folder " << entry.last_write_time() << std::endl;
                     files.push_back(harufile);
                 }
             }

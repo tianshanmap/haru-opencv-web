@@ -50,6 +50,11 @@ namespace haru {
         std::cout << "convert_mov_mp4=>" << cmd.get_command() << std::endl;
         std::system(cmd.get_command().c_str());
     }
+    void convert_mts_mp4(std::string &mov,std::string &mp4) {
+        HaruFFMpegMtsToMp4CMD cmd(mov,mp4);
+        std::cout << "convert_mts_mp4=>" << cmd.get_command() << std::endl;
+        std::system(cmd.get_command().c_str());
+    }
     std::string get_mp3_filename(std::string &&name) {
         // Finding a substring
         size_t index = name.find(".mp3");

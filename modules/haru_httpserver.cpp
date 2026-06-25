@@ -558,6 +558,21 @@ namespace haru {
             res.set_header("Access-Control-Allow-Origin", "*");
             res.set_content(s, "application/json"); });
 
+        svr.Get("/filesystem/convert", [](const auto &req, auto &res)
+                {
+            auto name = req.get_param_value("name");
+            auto parent = req.get_param_value("parent");
+            std::cout << "/filesystem/convert " << name << " to mp4 in " + parent << std::endl;
+            std::filesystem::path filepath(name);
+            std::string mp4_fielname = filepath.filename().replace_extension(".mp4");
+            std::filesystem::path parentpath(parent);
+            std::string output = parentpath / mp4_fielname;
+            convert_mts_mp4(name,output);
+            std::string s = get_folder_as_json(parent);
+            // Allow requests from any frontend origin
+            res.set_header("Access-Control-Allow-Origin", "*");
+            res.set_content(s, "application/json"); });
+
         svr.Post("/filesystem/upload", [](const auto &req, auto &res){
             auto f = req.form.get_file("file");
             std::string target = req.form.get_field("target");

@@ -127,6 +127,18 @@ namespace haru {
             return command;
         }
     };
+    struct HaruFFMpegMtsToMp4CMD {
+        std::string input_file;
+        std::string output_file;
+        HaruFFMpegMtsToMp4CMD(std::string &input,std::string &output) {
+            this->input_file = input;
+            this->output_file = output;
+        }
+        std::string get_command() {
+            std::string command = "ffmpeg -i " + input_file + " -c:v libx264 -crf 23 -c:a aac -b:a 128k " + output_file;
+            return command;
+        }
+    };
     // bool concatMP3(const std::string& file1,const std::string& file2,const std::string& output);
     // void concatenateMP3(const std::string& file1, const std::string& file2, const std::string& output);
     std::string concatenate_mp3(std::string &mp3_workspace,std::vector<std::string> &mp3_files);
@@ -134,5 +146,6 @@ namespace haru {
     void add_mp3_to_mp4(std::string mp3,std::string mp4);
     void combine_video(std::vector<std::string> files,std::string output_path,std::string ext);
     void convert_mov_mp4(std::string mov,std::string mp4);
+    void convert_mts_mp4(std::string &mov,std::string &mp4);
 }
 #endif //HARU_OPENCV_WEB_HARU_FFMPEG_H
