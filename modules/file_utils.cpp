@@ -246,6 +246,7 @@ namespace haru {
                 harufile.parent_path = entry.path().parent_path().string();
                 if (entry.is_directory()) {
                     harufile.kind = "folder";
+                    harufile.size = 0;
                     folders.push_back(harufile);
                 } else if (entry.is_regular_file()) {
                     harufile.kind = "file";

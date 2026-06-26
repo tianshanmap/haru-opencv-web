@@ -762,6 +762,36 @@ namespace haru {
             res.set_header("Access-Control-Allow-Origin", "*");
             res.set_content(s, "application/json"); });
 
+        svr.Get("/filesystem/download-chunk", [](const httplib::Request& req, httplib::Response& res) {
+            // Define the file to download
+            auto filename = req.get_param_value("name");
+            std::cout << "download-chunk filename=" << filename << std::endl;
+            std::ifstream *file = new std::ifstream(filename, std::ios::binary);
+
+            if (file == NULL) {
+                res.status = 404;
+                return;
+            }
+            // Set the callback that sends data in chunks
+            res.set_chunked_content_provider("application/octet-stream",
+                [file](size_t offset, httplib::DataSink& sink) mutable {
+                    std::vector<char> buffer(8192); // 8 KB chunk size
+                    file->read(buffer.data(), buffer.size());
+                    std::streamsize bytes_read = file->gcount();
+
+                    if (bytes_read > 0) {
+                        // Send the chunk to the client
+                        sink.write(buffer.data(), bytes_read);
+                        return true; // Continue sending
+                    } else {
+                        sink.done(); // Signal end of stream
+                        delete file;
+                        return false;
+                    }
+                }
+            );
+        });
+
         svr.set_mount_point("/static", config.static_path);
         svr.start(config.host, config.port);
         return 0; // Returning 0 indicates the program finished successfully
