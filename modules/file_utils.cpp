@@ -206,30 +206,42 @@ namespace haru {
         return files_parent;
     }
     std::string getLastWriteTimeStr(const std::filesystem::path& filePath) {
-        auto fileTime = std::filesystem::last_write_time(filePath);
+        try {
+            auto fileTime = std::filesystem::last_write_time(filePath);
 
-        // Convert file_time_type to system_clock time_point
-        auto systemTime = std::chrono::time_point_cast<std::chrono::system_clock::duration>(
-            fileTime - std::filesystem::file_time_type::clock::now() + std::chrono::system_clock::now()
-        );
+            // Convert file_time_type to system_clock time_point
+            auto systemTime = std::chrono::time_point_cast<std::chrono::system_clock::duration>(
+                fileTime - std::filesystem::file_time_type::clock::now() + std::chrono::system_clock::now()
+            );
 
-        // Convert to time_t for old C-style time parsing
-        std::time_t cTime = std::chrono::system_clock::to_time_t(systemTime);
+            // Convert to time_t for old C-style time parsing
+            std::time_t cTime = std::chrono::system_clock::to_time_t(systemTime);
 
-        // Thread-safe conversion to local time structure
-        std::tm localTime;
+            // Thread-safe conversion to local time structure
+            std::tm localTime;
 #if defined(_MSC_VER)
-        localtime_s(&localTime, &cTime); // Windows
+            localtime_s(&localTime, &cTime); // Windows
 #else
-        localtime_r(&cTime, &localTime); // POSIX/Linux
+            localtime_r(&cTime, &localTime); // POSIX/Linux
 #endif
 
-        // Format the time structure via a stringstream
-        std::ostringstream oss;
-        oss << std::put_time(&localTime, "%Y-%m-%d %H:%M:%S");
-        return oss.str();
+            // Format the time structure via a stringstream
+            std::ostringstream oss;
+            oss << std::put_time(&localTime, "%Y-%m-%d %H:%M:%S");
+            return oss.str();
+
+        } catch (...) {
+            return "";
+        }
     }
     unsigned long get_file_size(const std::filesystem::directory_entry& entry) {
+        try {
+            return entry.file_size();
+        } catch (...) {
+            return 0;
+        }
+    }
+    unsigned long get_file_time(const std::filesystem::directory_entry& entry) {
         try {
             return entry.file_size();
         } catch (...) {
