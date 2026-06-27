@@ -229,7 +229,13 @@ namespace haru {
         oss << std::put_time(&localTime, "%Y-%m-%d %H:%M:%S");
         return oss.str();
     }
-
+    unsigned long get_file_size(const std::filesystem::directory_entry& entry) {
+        try {
+            return entry.file_size();
+        } catch (...) {
+            return 0;
+        }
+    }
     HaruFolder get_folder(std::string path) {
         std::filesystem::path filePath(path);
         HaruFolder folder;
@@ -250,7 +256,7 @@ namespace haru {
                     folders.push_back(harufile);
                 } else if (entry.is_regular_file()) {
                     harufile.kind = "file";
-                    harufile.size = entry.file_size();
+                    harufile.size = get_file_size(entry);
                     harufile.last_update = getLastWriteTimeStr(entry);
                     std::cout << "get_folder " << entry.last_write_time() << std::endl;
                     files.push_back(harufile);
