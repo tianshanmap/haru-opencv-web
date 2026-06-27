@@ -270,7 +270,6 @@ namespace haru {
                     harufile.kind = "file";
                     harufile.size = get_file_size(entry);
                     harufile.last_update = getLastWriteTimeStr(entry);
-                    std::cout << "get_folder " << entry.last_write_time() << std::endl;
                     files.push_back(harufile);
                 }
             }
