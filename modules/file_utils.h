@@ -44,5 +44,7 @@ namespace haru {
     void scanFiles(std::string &path,std::vector<std::string> &files);
     void rename(std::string &file1,std::string &file2);
     std::string getLastWriteTimeStr(const std::filesystem::path& filePath);
+    void write_file(std::string &path,std::string &content);
+    std::string read_file(std::string &path);
 }
 #endif //HARU_OPENCV_WEB_FILE_UTILS_H

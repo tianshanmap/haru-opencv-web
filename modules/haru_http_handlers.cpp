@@ -57,5 +57,21 @@ namespace haru {
           };
         return response.dump();
     }
-
+    TextSaveRequest get_text_save_request(const httplib::Request &req) {
+        json incoming_json = json::parse(req.body);
+        TextSaveRequest request;
+        request.file_path = incoming_json["file_path"];
+        request.content = incoming_json["content"];
+        request.created_by = incoming_json["created_by"];
+        std::filesystem::path path = request.file_path;
+        request.parent_path = path.parent_path();
+        return request;
+    }
+    std::string get_text_load_response(const TextLoadResponse &res){
+        nlohmann::json response = {
+            {"name", res.name},
+            {"content", res.content},
+          };
+        return response.dump();
+    }
 }

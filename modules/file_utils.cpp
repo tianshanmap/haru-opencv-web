@@ -441,5 +441,38 @@ namespace haru {
     std::string get_file_name(std::string &parent_path,std::string file_path) {
         return file_path.substr(parent_path.size() + 1);
     }
+    void write_file(std::string &file_path,std::string &content) {
+        std::ofstream outputFile(file_path);
 
+        // 2. Check if the file opened successfully
+        if (!outputFile.is_open()) {
+            std::cerr << "Error: Could not open the file!" << std::endl;
+            return;
+        }
+
+        // 3. Write text to the file using the stream insertion operator (<<)
+        outputFile << content << std::endl;
+
+        // 4. Close the file (optional but good practice)
+        outputFile.close();
+
+    }
+    std::string read_file(std::string &file_path) {
+        std::ifstream inputFile(file_path);
+
+        // 2. Check if the file opened successfully
+        if (!inputFile.is_open()) {
+            std::cerr << "Error: Could not open the file!" << std::endl;
+            return "";
+        }
+
+        std::stringstream buffer;
+
+        // Read the entire file buffer into the stream
+        buffer << inputFile.rdbuf();
+
+        std::string file_contents = buffer.str();
+        inputFile.close();
+        return file_contents;
+    }
 }

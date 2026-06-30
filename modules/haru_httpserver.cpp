@@ -791,6 +791,29 @@ namespace haru {
                 }
             );
         });
+        svr.Post("/filesystem/texteditor/save", [config](const auto &req, auto &res)
+                {
+            if (req.has_header("Content-Type") && req.get_header_value("Content-Type") != "application/json") {
+                res.status = 400;
+                res.set_content(R"({"error": "Content-Type must be application/json"})", "application/json");
+                return;
+            }
+            TextSaveRequest text_save_request = get_text_save_request(req);
+            write_file(text_save_request.file_path, text_save_request.content);
+            std::string s = get_folder_as_json(text_save_request.parent_path);
+            // Allow requests from any frontend origin
+            res.set_header("Access-Control-Allow-Origin", "*");
+            res.set_content(s, "application/json"); });
+        svr.Get("/filesystem/texteditor/load", [config](const auto &req, auto &res)
+                {
+            std::string filename = req.get_param_value("name");
+            std::string s = read_file(filename);
+            TextLoadResponse text_load_response;
+            text_load_response.name = filename;
+            text_load_response.content = s;
+            // Allow requests from any frontend origin
+            res.set_header("Access-Control-Allow-Origin", "*");
+            res.set_content(get_text_load_response(text_load_response), "html/text"); });
 
         svr.set_mount_point("/static", config.static_path);
         svr.start(config.host, config.port);
